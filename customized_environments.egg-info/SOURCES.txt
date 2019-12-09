@@ -1,0 +1,6 @@
+setup.py
+customized_environments.egg-info/PKG-INFO
+customized_environments.egg-info/SOURCES.txt
+customized_environments.egg-info/dependency_links.txt
+customized_environments.egg-info/requires.txt
+customized_environments.egg-info/top_level.txt

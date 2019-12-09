@@ -23,10 +23,12 @@
 			 IV. unit_density_aa
 
 4. bestäm output
-	A. x-position
-	B. y-position
-	C. move/attack
-	D. ability (stim) ?
+	A. gå upp
+	B. gå ner
+	C. gå höger
+	D. gå vänster
+	E. attackera närmasta
+	F. inget (no action)
 
 5. "implementera" NN
 

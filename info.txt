@@ -16,6 +16,9 @@ OpenAI "Spinning Up":
 
 stable baselines tutorial:
 	https://stable-baselines.readthedocs.io/en/master/guide/custom_env.html
+	https://github.com/openai/gym/blob/master/docs/creating-environments.md
+	https://github.com/openai/gym-soccer
+	https://towardsdatascience.com/create-a-customized-gym-environment-for-star-craft-2-8558d301131f
 
 starta pysc2 med agent:
 	py -3.5 -m pysc2.bin.agent --map <karta> --agent <agent>
