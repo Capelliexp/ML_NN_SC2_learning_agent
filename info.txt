@@ -1,0 +1,132 @@
+pysc2 dokumentation:
+	https://github.com/deepmind/pysc2/blob/master/docs/environment.md#rl-environment
+	
+map tutorial:
+	1. https://sc2mapster.gamepedia.com/SC2Mapster_Wiki
+	2. https://s2editor-tutorials.readthedocs.io/en/master/
+	3. https://www.youtube.com/watch?v=rXAchD7O4Lw
+	4. https://www.youtube.com/watch?v=eZijQHwnmkQ
+
+mini-game dokumentation:
+	1. https://github.com/SoyGema/Startcraft_pysc2_minigames/blob/master/docs/README.md
+	2. https://github.com/SoyGema/Startcraft_pysc2_minigames
+
+OpenAI "Spinning Up":
+	https://spinningup.openai.com/en/latest/user/introduction.html#what-this-is
+
+stable baselines tutorial:
+	https://stable-baselines.readthedocs.io/en/master/guide/custom_env.html
+
+starta pysc2 med agent:
+	py -3.5 -m pysc2.bin.agent --map <karta> --agent <agent>
+
+
+
+
+
+
+
+
+
+
+
+
+python 3.5.2
+Starcraft 2 4.11.1.77474
+
+absl-py                        0.8.1
+astor                          0.8.0
+astroid                        2.3.3
+atari-py                       0.2.6
+azure                          1.0.3
+azure-common                   1.1.23
+azure-mgmt                     0.20.2
+azure-mgmt-common              0.20.0
+azure-mgmt-compute             0.20.1
+azure-mgmt-network             0.20.1
+azure-mgmt-nspkg               3.0.2
+azure-mgmt-resource            0.20.1
+azure-mgmt-storage             0.20.0
+azure-nspkg                    3.0.2
+azure-servicebus               0.20.1
+azure-servicemanagement-legacy 0.20.2
+azure-storage                  0.20.3
+baseline                       0.2.1
+baselines                      0.1.5
+cachetools                     3.1.1
+certifi                        2019.11.28
+cffi                           1.13.2
+chardet                        3.0.4
+Click                          7.0
+cloudpickle                    1.2.2
+colorama                       0.4.1
+Cython                         0.29.14
+deepdiff                       4.0.9
+dill                           0.3.1.1
+enum34                         1.1.6
+future                         0.18.2
+gast                           0.2.2
+glfw                           1.8.5
+google-auth                    1.7.1
+google-auth-oauthlib           0.4.1
+google-pasta                   0.1.8
+grpcio                         1.25.0
+gym                            0.15.4
+h5py                           2.10.0
+idna                           2.8
+imageio                        2.6.1
+isort                          4.3.21
+joblib                         0.14.0
+jsonpickle                     1.2
+Keras-Applications             1.0.8
+Keras-Preprocessing            1.1.0
+lazy-object-proxy              1.4.3
+lockfile                       0.12.2
+Markdown                       3.1.1
+mccabe                         0.6.1
+mock                           3.0.5
+mpi4py                         3.0.3
+mpyq                           0.2.5
+mujoco-py                      1.50.1.68
+numpy                          1.17.4
+oauthlib                       3.1.0
+opencv-python                  4.1.2.30
+opt-einsum                     3.1.0
+ordered-set                    3.1.1
+Pillow                         6.2.1
+pip                            19.3.1
+portpicker                     1.3.1
+progressbar2                   3.47.0
+protobuf                       3.11.1
+pyasn1                         0.4.8
+pyasn1-modules                 0.2.7
+pycparser                      2.19
+pygame                         1.9.6
+pyglet                         1.3.2
+pylint                         2.4.4
+PySC2                          3.0.0
+python-dateutil                2.8.1
+python-utils                   2.3.0
+pyzmq                          18.1.1
+requests                       2.22.0
+requests-oauthlib              1.3.0
+rsa                            4.0
+s2clientprotocol               4.11.0.77379.0
+s2protocol                     4.11.0.77379.0
+scipy                          1.3.3
+setuptools                     42.0.2
+six                            1.13.0
+sk-video                       1.1.10
+tensorboard                    1.14.0
+tensorflow                     1.14.0
+tensorflow-estimator           1.14.0
+termcolor                      1.1.0
+tqdm                           4.40.0
+typed-ast                      1.4.0
+urllib3                        1.25.7
+websocket-client               0.56.0
+Werkzeug                       0.16.0
+wheel                          0.33.6
+whichcraft                     0.6.1
+wrapt                          1.11.2
+zmq                            0.0.0

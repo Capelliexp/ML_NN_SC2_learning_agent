@@ -1,0 +1,34 @@
+1. lösa hur jag kan använda flera agenter i samma karta (pysc2 kan bara köra 2 separata agenter)
+	A. kör samma NN, med 1 agent per frame. Flytta kameran innan framebyte så slipper man pilla på småsaker
+
+2. skapa ett mini-game
+	A. flera svårighetsgrader ?
+	B. flera kartor
+		a. flera fiende-setups per karta
+
+3. bestäm features
+	A. HP
+	B. tid sen förra attack / attack CD nedräkning
+	C. levande kompisar
+	D. levande fiender ?
+	E. mål
+	F. texturer
+		a. minimap
+			 II. camera ?
+			III. player_relative
+			 IV. selected 
+		b. screen
+			 II. player_relative
+			III. selected
+			 IV. unit_density_aa
+
+4. bestäm output
+	A. x-position
+	B. y-position
+	C. move/attack
+	D. ability (stim) ?
+
+5. "implementera" NN
+
+6. träna agent
+
