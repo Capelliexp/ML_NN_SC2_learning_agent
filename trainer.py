@@ -23,6 +23,6 @@ model = PPO2(MlpPolicy, env, verbose=1, tensorboard_log="gym_ouput/log/")
 for i in range(1,20):
     save_name = "gym_ouput/NN" + i.__str__()
 
-    model.learn(total_timesteps=int(5e4), tb_log_name="run", reset_num_timesteps=False)
+    model.learn(total_timesteps=int(2e4), tb_log_name="run", reset_num_timesteps=False)
     model.save(save_name)
 

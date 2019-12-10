@@ -21,18 +21,24 @@ class CustomAgent(gym.Env):
         'players': [sc2_env.Agent(sc2_env.Race.terran),
             sc2_env.Bot(sc2_env.Race.zerg, sc2_env.Difficulty.hard)],
         'agent_interface_format': features.AgentInterfaceFormat(
-            feature_dimensions = None,
+            #feature_dimensions = None,
+            feature_dimensions = features.Dimensions(screen=64, minimap=64),
             rgb_dimensions = None,
-            raw_resolution = 64,   #test other res
+            raw_resolution = 64,
             action_space = actions.ActionSpace.RAW,
             camera_width_world_units = None,
-            use_feature_units = False,
+            #camera_width_world_units = 64,
+            #use_feature_units = False,
+            use_feature_units = True,
             use_raw_units = True,
-            use_raw_actions = False,
+            #use_raw_actions = False,
+            use_raw_actions = True,
             max_raw_actions = 512,
             max_selected_units = 30,
+            #max_selected_units = 1,
             use_unit_counts = False,
             use_camera_position = False,
+            #use_camera_position = True,
             show_cloaked = False,
             show_burrowed_shadows = False,
             show_placeholders = False,
@@ -46,8 +52,10 @@ class CustomAgent(gym.Env):
             ),
         'discount': 1,
         'discount_zero_after_timeout': False,
-        'visualize': False,
-        'step_mul': None,
+        #'visualize': False,
+        'visualize': True,
+        #'step_mul': None,
+        'step_mul': 8,
         'realtime': False,    #should be false during training
         'save_replay_episodes': 0,
         'replay_dir': None,
@@ -58,7 +66,7 @@ class CustomAgent(gym.Env):
         'random_seed': None,
         'disable_fog': False,
         'ensure_available_actions': True,
-        'version': None,
+        'version': None
     }
 
     def __init__(self, **kwargs):
@@ -99,11 +107,20 @@ class CustomAgent(gym.Env):
         return self.get_derived_obs(raw_obs)
 
     def get_derived_obs(self, raw_obs):
+        # manualy convert raw_obs from pysc2 to the user defined input obs
+
         obs = np.zeros((19,3), dtype=np.uint8)
 
         marines = self.get_units_by_type(raw_obs, units.Terran.Marine, 1)   # team 1: my team
         zerglings = self.get_units_by_type(raw_obs, units.Zerg.Zergling, 4) # team 4: enemy team
         banelings = self.get_units_by_type(raw_obs, units.Zerg.Baneling, 4)
+
+        #player_relative = raw_obs.observation["screen"][features.SCREEN_FEATURES.player_relative.index]
+        #player_relative = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index]
+
+        #if player_relative is not None:
+        #    print("YAS!")
+        
 
         self.marines = []
         self.banelings = []
