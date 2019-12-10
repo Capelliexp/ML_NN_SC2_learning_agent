@@ -78,14 +78,48 @@ class CustomAgent(gym.Env):
         self.banelings = []
         self.zerglings = []
 
-        self.action_space = spaces.Discrete(123)  #preliminary
-
+        """
         self.observation_space = spaces.Box(    #preliminary
             low=0,
             high=64,
             shape=(19,3),
             dtype=np.uint8  #new
         )
+        """
+
+        self.observation_space = spaces.Dict({
+            'tensor_ints' : spaces.Dict({
+                'HP' : spaces.Discrete(1),
+                'allies' : spaces.Discrete(1),
+                'enemies' : spaces.Discrete(1),
+                'pos' : spaces.Box(low = 0, high = 64, shape = (2,1), dtype = np.int32),
+                'goal' : spaces.Box(low = 0, high = 64, shape = (2,1), dtype = np.int32)
+            }),
+            'tensor_floats' : spaces.Dict({
+                'attack_reset' : spaces.Box(low = 0, high = 3, shape = (1,1), dtype = np.float32),
+                'distance_to_goal' : spaces.Box(low = 0, high = 100, shape = (1,1), dtype = np.float32)
+            }),
+            'textures' : spaces.Dict({
+                'player_relative' : spaces.Box(low = 0, high = 255, shape = (64,64), dtype = np.float32),
+                'selected' : spaces.Box(low = 0, high = 255, shape = (64,64), dtype = np.float32)
+            })
+        })
+
+        """
+        self.action_space = spaces.Discrete(123)  #preliminary
+        """
+
+        self.action_space = spaces.Dict({
+            'tensor_movement' : spaces.Dict({
+                'up' : spaces.Box(low = 0, high = 1, shape = (1,1), dtype = np.float32),
+                'down' : spaces.Box(low = 0, high = 1, shape = (1,1), dtype = np.float32),
+                'left' : spaces.Box(low = 0, high = 1, shape = (1,1), dtype = np.float32),
+                'right' : spaces.Box(low = 0, high = 1, shape = (1,1), dtype = np.float32)
+            }),
+            'tensor_actions' : spaces.Dict({
+                'attack' : spaces.Discrete(1)
+            })
+        })
 
         self.episodes = 0
         self.steps = 0

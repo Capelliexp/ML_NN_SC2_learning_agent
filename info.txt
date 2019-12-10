@@ -2,7 +2,7 @@ pysc2 dokumentation/tutorials:
 	https://github.com/deepmind/pysc2/blob/master/docs/environment.md#rl-environment
 	https://medium.com/@SmartLabAI/introducing-the-pysc2-library-starcraft-ii-3b54396f421a
 	https://www.reddit.com/r/sc2ai/comments/7qf0my/list_of_observations_for_pysc2/
-	
+	https://itnext.io/create-a-protoss-bot-using-raw-observations-and-actions-in-pysc2-615f41aa283e
 	
 map tutorial:
 	1. https://sc2mapster.gamepedia.com/SC2Mapster_Wiki

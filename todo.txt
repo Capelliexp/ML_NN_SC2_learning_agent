@@ -7,12 +7,14 @@
 		a. flera fiende-setups per karta
 
 3. bestäm features
-	A. HP
-	B. tid sen förra attack / attack CD nedräkning
-	C. levande kompisar
-	D. levande fiender ?
-	E. mål
-	F. texturer
+	A. HP (int)
+	B. tid sen förra attack / attack CD nedräkning (float)
+	C. levande kompisar (int)
+	D. levande fiender ? (int)
+	E. position (int,int)
+	F. mål (int,int)
+	G. distans till mål (float)
+	H. texturer
 		a. minimap
 			 II. camera ?
 			III. player_relative
