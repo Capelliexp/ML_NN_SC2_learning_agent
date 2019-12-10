@@ -16,8 +16,6 @@ env = gym.make('defeat-zerglings-banelings-v0')
 eng = CustomAgent()
 env = DummyVecEnv([lambda: CustomAgent()])
 
-
-
 # use ppo2 to learn and save the model when finished
 model = PPO2(MlpPolicy, env, verbose=1, tensorboard_log="gym_ouput/log/")
 #model = PPO2.load("gym_ouput/NN")  # load existing network
