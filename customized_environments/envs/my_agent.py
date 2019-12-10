@@ -4,11 +4,6 @@ from gym import error, spaces, utils
 from gym.utils import seeding
 
 """SC2"""
-#from __future__ import absolute_import
-#from __future__ import division
-#from __future__ import print_function
-
-#from pysc2.agents import base_agent
 from pysc2.lib import actions, features, units
 from pysc2.env import sc2_env
 
@@ -20,16 +15,31 @@ class CustomAgent(gym.Env):
     metadata = {'render.modes':['human']}
 
     default_settings = {    #OBS! fix
+        '_only_use_kwargs': None,
         'map_name': "DefeatZerglingsAndBanelings",
+        'battle_net_map': False,
         'players': [sc2_env.Agent(sc2_env.Race.terran),
-                    sc2_env.Bot(sc2_env.Race.zerg, sc2_env.Difficulty.hard)
-                    ],
+            sc2_env.Bot(sc2_env.Race.zerg, sc2_env.Difficulty.hard)],
         'agent_interface_format': features.AgentInterfaceFormat(
-                    action_space=actions.ActionSpace.RAW,
-                    use_raw_units=True,
-                    raw_resolution=64   #test other res
-                    ),
-        'realtime': False    #should be false during training
+            action_space=actions.ActionSpace.RAW,
+            use_raw_units=True,
+            raw_resolution=64   #test other res
+            ),
+        'discount': 1,
+        'discount_zero_after_timeout': False,
+        'visualize': False,
+        'step_mul': None,
+        'realtime': False,    #should be false during training
+        'save_replay_episodes': 0,
+        'replay_dir': None,
+        'replay_prefix': None,
+        'game_steps_per_episode': None,
+        'score_index': None,
+        'score_multiplier': None,
+        'random_seed': None,
+        'disable_fog': False,
+        'ensure_available_actions': True,
+        'version': None,
     }
 
     def __init__(self, **kwargs):
@@ -50,12 +60,12 @@ class CustomAgent(gym.Env):
             dtype=np.uint8  #new
         )
 
-        self.reward = 0
         self.episodes = 0
         self.steps = 0
 
     def reset(self):
         self.episodes += 1
+        self.steps = 0
         
         if self.env is None:
             args = {**self.default_settings, **self.kwargs}
@@ -129,6 +139,7 @@ class CustomAgent(gym.Env):
             action_mapped = self.attack(aidx, eidx)
         
         raw_obs = self.env.step([action_mapped])[0]
+
         return raw_obs
 
     def move(self, idx, diff_x=0, diff_y=0):
