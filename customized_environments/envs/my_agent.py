@@ -9,6 +9,7 @@ from pysc2.env import sc2_env
 
 """other"""
 import logging
+import math
 import numpy as np
 
 class CustomAgent(gym.Env):
@@ -52,8 +53,8 @@ class CustomAgent(gym.Env):
             ),
         'discount': 1,
         'discount_zero_after_timeout': False,
-        #'visualize': False,
-        'visualize': True,
+        'visualize': False,
+        #'visualize': True,
         #'step_mul': None,
         'step_mul': 8,
         'realtime': False,    #should be false during training
@@ -78,6 +79,8 @@ class CustomAgent(gym.Env):
         self.banelings = []
         self.zerglings = []
 
+        self.goal = [0,0]
+
         """
         self.observation_space = spaces.Box(    #preliminary
             low=0,
@@ -87,6 +90,11 @@ class CustomAgent(gym.Env):
         )
         """
 
+        """
+        self.action_space = spaces.Discrete(123)  #preliminary
+        """
+
+        """
         self.observation_space = spaces.Dict({
             'tensor_ints' : spaces.Dict({
                 'HP' : spaces.Discrete(1),
@@ -105,21 +113,66 @@ class CustomAgent(gym.Env):
             })
         })
 
-        """
-        self.action_space = spaces.Discrete(123)  #preliminary
-        """
-
         self.action_space = spaces.Dict({
             'tensor_movement' : spaces.Dict({
-                'up' : spaces.Box(low = 0, high = 1, shape = (1,1), dtype = np.float32),
-                'down' : spaces.Box(low = 0, high = 1, shape = (1,1), dtype = np.float32),
-                'left' : spaces.Box(low = 0, high = 1, shape = (1,1), dtype = np.float32),
-                'right' : spaces.Box(low = 0, high = 1, shape = (1,1), dtype = np.float32)
+                'x' : spaces.Box(low = -1, high = 1, shape = (1,1), dtype = np.float32),
+                'y' : spaces.Box(low = -1, high = 1, shape = (1,1), dtype = np.float32),
             }),
             'tensor_actions' : spaces.Dict({
-                'attack' : spaces.Discrete(1)
+                'attack_closest' : spaces.Discrete(1)
             })
         })
+        """
+
+        """
+        self.observation_space = spaces.Dict({
+            'HP' : spaces.Discrete(1),
+            'allies' : spaces.Discrete(1),
+            'enemies' : spaces.Discrete(1),
+            'pos' : spaces.Box(low = 0, high = 64, shape = (2,1), dtype = np.int32),
+            'goal' : spaces.Box(low = 0, high = 64, shape = (2,1), dtype = np.int32),
+            'attack_reset' : spaces.Box(low = 0, high = 3, shape = (1,1), dtype = np.float32),
+            'distance_to_goal' : spaces.Box(low = 0, high = 100, shape = (1,1), dtype = np.float32),
+            'player_relative' : spaces.Box(low = 0, high = 255, shape = (64,64), dtype = np.float32),
+            'selected' : spaces.Box(low = 0, high = 255, shape = (64,64), dtype = np.float32)
+        })
+
+        self.action_space = spaces.Dict({
+            'x' : spaces.Box(low = -1, high = 1, shape = (1,1), dtype = np.float32),
+            'y' : spaces.Box(low = -1, high = 1, shape = (1,1), dtype = np.float32),
+            'attack_closest' : spaces.Discrete(1)
+        })
+        """
+
+        """
+        self.observation_space = spaces.Tuple((
+            spaces.Discrete(1), # HP
+            spaces.Discrete(1), # allies
+            spaces.Discrete(1), # enemies
+            spaces.Box(low = 0, high = 64, shape = (2,1), dtype = np.int32),    # pos
+            spaces.Box(low = 0, high = 64, shape = (2,1), dtype = np.int32),    # goal
+            
+            spaces.Box(low = 0, high = 3, shape = (1,1), dtype = np.float32),   # attack_reset
+            spaces.Box(low = 0, high = 100, shape = (1,1), dtype = np.float32), # distance_to_goal
+            
+            spaces.Box(low = 0, high = 255, shape = (64,64), dtype = np.float32),   # player_relative
+            spaces.Box(low = 0, high = 255, shape = (64,64), dtype = np.float32)    # selected
+        ))
+        """
+
+        """
+        self.action_space = spaces.Tuple((
+            spaces.Box(low = -1, high = 1, shape = (1,1), dtype = np.float32),  # x
+            spaces.Box(low = -1, high = 1, shape = (1,1), dtype = np.float32),  # y
+            spaces.Discrete(1)  # attack_closest
+        ))
+        """
+
+        self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2+1, 64, 3), dtype = np.float32)
+
+        #self.action_space = spaces.Discrete(3)
+        #self.action_space = spaces.Box(low = -1, high = 1, shape = (3, 3), dtype = np.float32)
+        self.action_space = spaces.Box(np.array([-1, -1, 0]), np.array([1, 1, 1]))
 
         self.episodes = 0
         self.steps = 0
@@ -127,6 +180,8 @@ class CustomAgent(gym.Env):
     def reset(self):
         self.episodes += 1
         self.steps = 0
+
+        self.goal = [0,0]
         
         if self.env is None:
             args = {**self.default_settings, **self.kwargs}
@@ -142,12 +197,34 @@ class CustomAgent(gym.Env):
 
     def get_derived_obs(self, raw_obs):
         # manualy convert raw_obs from pysc2 to the user defined input obs
+        # return array with observation containing self.observation_space variables
 
-        obs = np.zeros((19,3), dtype=np.uint8)
+        obs = 0
+        #obs = np.zeros((19,3), dtype=np.uint8)
+
+
 
         marines = self.get_units_by_type(raw_obs, units.Terran.Marine, 1)   # team 1: my team
         zerglings = self.get_units_by_type(raw_obs, units.Zerg.Zergling, 4) # team 4: enemy team
         banelings = self.get_units_by_type(raw_obs, units.Zerg.Baneling, 4)
+
+        """
+        marine_it = self.steps%len(marines)
+
+        obs = self.observation_space
+        obs['tensor_ints']['HP'] = marines[marine_it].health
+        obs['tensor_ints']['allies'] = len(marines)
+        obs['tensor_ints']['enemies'] = len(zerglings) + len(banelings)
+        obs['tensor_ints']['pos'] = marines[marine_it].position
+        obs['tensor_ints']['goal'] = self.goal
+
+        obs['tensor_floats']['attack_reset'] = marines[marine_it].weapons[0].cooldown
+        obs['tensor_floats']['distance_to_goal'] = math.sqrt(
+            (marines[marine_it].position.x - self.goal[0])**2 + (marines[marine_it].position.y - self.goal[1])**2)
+
+        obs['textures']['player_relative'] = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index]
+        obs['textures']['selected'] = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index]
+        """
 
         #player_relative = raw_obs.observation["screen"][features.SCREEN_FEATURES.player_relative.index]
         #player_relative = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index]
@@ -156,27 +233,27 @@ class CustomAgent(gym.Env):
         #    print("YAS!")
         
 
-        self.marines = []
-        self.banelings = []
-        self.zerglings = []
+        #self.marines = []
+        #self.banelings = []
+        #self.zerglings = []
 
-        for i, m in enumerate(marines):
-            self.marines.append(m)
-            obs[i] = np.array([m.x, m.y, m[2]])
+        #for i, m in enumerate(marines):
+        #    self.marines.append(m)
+        #    obs[i] = np.array([m.x, m.y, m[2]])
 
-        for i, b in enumerate(banelings):
-            self.banelings.append(b)
-            obs[i+9] = np.array([b.x, b.y, b[2]])
+        #for i, b in enumerate(banelings):
+        #    self.banelings.append(b)
+        #    obs[i+9] = np.array([b.x, b.y, b[2]])
 
-        for i, z in enumerate(zerglings):
-            self.zerglings.append(z)
-            obs[i+13] = np.array([z.x, z.y, z[2]])
+        #for i, z in enumerate(zerglings):
+        #    self.zerglings.append(z)
+        #    obs[i+13] = np.array([z.x, z.y, z[2]])
         
         return obs
 
     def get_units_by_type(self, obs, unit_type, player_relative=0):
         return [unit for unit in obs.observation.raw_units
-            if unit.unit_type == unit_type and unit.alliance == player_relative
+                if unit.unit_type == unit_type and unit.alliance == player_relative
             ]
 
     def step(self, action):
