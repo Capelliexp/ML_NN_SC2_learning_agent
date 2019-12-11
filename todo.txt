@@ -16,13 +16,14 @@
 	G. distans till mål (float)
 	H. texturer
 		a. minimap
+			  I. height (för väggar)
 			 II. camera ?
 			III. player_relative
 			 IV. selected 
 		b. screen
-			 II. player_relative
-			III. selected
-			 IV. unit_density_aa
+			  I. player_relative
+			 II. selected
+			III. unit_density_aa ?
 
 4. bestäm output
 	A. gå upp

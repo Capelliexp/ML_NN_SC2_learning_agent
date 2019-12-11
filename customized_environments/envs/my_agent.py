@@ -168,7 +168,9 @@ class CustomAgent(gym.Env):
         ))
         """
 
-        self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2+1, 64, 3), dtype = np.float32)
+        #self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2+1, 64, 3), dtype = np.float32)
+        #self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2, 64, 3), dtype = np.float32)
+        self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2, 64), dtype = np.float32)
 
         #self.action_space = spaces.Discrete(3)
         #self.action_space = spaces.Box(low = -1, high = 1, shape = (3, 3), dtype = np.float32)
@@ -208,18 +210,39 @@ class CustomAgent(gym.Env):
 
         marine_it = self.steps%len(marines)
 
+        goal_dist = math.sqrt((marines[marine_it].x - self.goal[0])**2 + (marines[marine_it].y - self.goal[1])**2)
+
         #obs = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index]
         #obs = np.tile(obs, raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index])
-        obs = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index] + raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index]
-        obs = np.tile(obs, [
+
+        #obs = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index]
+        #obs = obs + raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index]
+
+        obs = np.concatenate((
+            raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index],
+            raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index]
+            ))
+
+        """obs = np.tile(obs, [
             marines[marine_it].health,          # HP
             len(marines),                       # allies
             len(zerglings) + len(banelings),    # enemies
-            marines[marine_it].position,        # pos - FEL
+            [marines[marine_it].x, marines[marine_it].y],   # pos
             self.goal,                          # goal
-            marines[marine_it].weapons[0].cooldown, # attack_reset
-            math.sqrt((marines[marine_it].position.x - self.goal[0])**2 + (marines[marine_it].position.y - self.goal[1])**2)    # distance_to_goal
-        ])
+            marines[marine_it].weapon_cooldown, # attack_reset
+            goal_dist                           # distance_to_goal
+        ])"""
+        #obs = np.tile(obs, np.zeros((1, 64-9, 3), dtype = np.float32))
+        """obs = obs + [
+            marines[marine_it].health,          # HP
+            len(marines),                       # allies
+            len(zerglings) + len(banelings),    # enemies
+            [marines[marine_it].x, marines[marine_it].y],   # pos
+            self.goal,                          # goal
+            marines[marine_it].weapon_cooldown, # attack_reset
+            goal_dist                           # distance_to_goal
+        ]"""
+        #obs = obs + np.zeros((1, 64-9, 3), dtype = np.float32)
 
         """
         obs = self.observation_space
