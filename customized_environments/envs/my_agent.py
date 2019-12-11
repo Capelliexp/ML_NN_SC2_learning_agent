@@ -199,18 +199,29 @@ class CustomAgent(gym.Env):
         # manualy convert raw_obs from pysc2 to the user defined input obs
         # return array with observation containing self.observation_space variables
 
-        obs = 0
+        #obs = np.zeros((64*2+1, 64, 3), dtype = np.float32)
         #obs = np.zeros((19,3), dtype=np.uint8)
-
-
 
         marines = self.get_units_by_type(raw_obs, units.Terran.Marine, 1)   # team 1: my team
         zerglings = self.get_units_by_type(raw_obs, units.Zerg.Zergling, 4) # team 4: enemy team
         banelings = self.get_units_by_type(raw_obs, units.Zerg.Baneling, 4)
 
-        """
         marine_it = self.steps%len(marines)
 
+        #obs = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index]
+        #obs = np.tile(obs, raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index])
+        obs = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index] + raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index]
+        obs = np.tile(obs, [
+            marines[marine_it].health,          # HP
+            len(marines),                       # allies
+            len(zerglings) + len(banelings),    # enemies
+            marines[marine_it].position,        # pos - FEL
+            self.goal,                          # goal
+            marines[marine_it].weapons[0].cooldown, # attack_reset
+            math.sqrt((marines[marine_it].position.x - self.goal[0])**2 + (marines[marine_it].position.y - self.goal[1])**2)    # distance_to_goal
+        ])
+
+        """
         obs = self.observation_space
         obs['tensor_ints']['HP'] = marines[marine_it].health
         obs['tensor_ints']['allies'] = len(marines)
