@@ -56,7 +56,7 @@ class CustomAgent(gym.Env):
         'visualize': False,
         #'visualize': True,
         #'step_mul': None,
-        'step_mul': 8,
+        'step_mul': 4,
         'realtime': False,    #should be false during training
         'save_replay_episodes': 0,
         'replay_dir': None,
@@ -193,6 +193,8 @@ class CustomAgent(gym.Env):
         self.banelings = []
         self.zerglings = []
 
+        self.current_marine_it = 0
+
         raw_obs = self.env.reset()[0]
         
         return self.get_derived_obs(raw_obs)
@@ -209,9 +211,12 @@ class CustomAgent(gym.Env):
         self.banelings = self.get_units_by_type(raw_obs, units.Zerg.Baneling, 4)
 
         #marine_it = self.steps%len(marines)
-        self.current_marine_it = self.steps%len(self.marines)
+        if len(self.marines) > 0:
+            self.current_marine_it = self.steps%len(self.marines)
+        else:
+            self.current_marine_it = 0
 
-        goal_dist = math.sqrt((self.marines[self.current_marine_it].x - self.goal[0])**2 + (self.marines[self.current_marine_it].y - self.goal[1])**2)
+        #goal_dist = math.sqrt((self.marines[self.current_marine_it].x - self.goal[0])**2 + (self.marines[self.current_marine_it].y - self.goal[1])**2)
 
         #obs = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index]
         #obs = np.tile(obs, raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index])
@@ -293,7 +298,7 @@ class CustomAgent(gym.Env):
 
     def step(self, action):
         self.steps += 1
-        
+
         raw_obs = self.take_action(action)
         reward = raw_obs.reward
         obs = self.get_derived_obs(raw_obs)
@@ -305,23 +310,16 @@ class CustomAgent(gym.Env):
 
         selected = self.marines[self.current_marine_it]
 
-        if action[0] > 0:
-            x = 1
-        else:
-            x = -1
-
-        if action[1] > 0:
-            y = 1
-        else:
-            y = -1
-
+        x = 1 if action[0] > 0 else -1
+        y = 1 if action[1] > 0 else -1
         attack = action[2]
 
         if attack > 0.5:
             #action_mapped = actions.RAW_FUNCTIONS.attack_closest(selected.tag)
-            action_mapped = actions.RAW_FUNCTIONS.no_op()
+            #action_mapped = actions.RAW_FUNCTIONS.no_op()
+            action_mapped = actions.RAW_FUNCTIONS.Move_pt("now", selected.tag, [selected.x, selected.y])
         else:
-            new_pos = [selected.x + x, selected.y + y]
+            new_pos = [selected.x + x*2, selected.y + y*2]
             action_mapped = actions.RAW_FUNCTIONS.Move_pt("now", selected.tag, new_pos)
 
         raw_obs = self.env.step([action_mapped])[0]
