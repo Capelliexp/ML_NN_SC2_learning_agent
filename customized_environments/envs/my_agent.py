@@ -204,13 +204,14 @@ class CustomAgent(gym.Env):
         #obs = np.zeros((64*2+1, 64, 3), dtype = np.float32)
         #obs = np.zeros((19,3), dtype=np.uint8)
 
-        marines = self.get_units_by_type(raw_obs, units.Terran.Marine, 1)   # team 1: my team
-        zerglings = self.get_units_by_type(raw_obs, units.Zerg.Zergling, 4) # team 4: enemy team
-        banelings = self.get_units_by_type(raw_obs, units.Zerg.Baneling, 4)
+        self.marines = self.get_units_by_type(raw_obs, units.Terran.Marine, 1)   # team 1: my team
+        self.zerglings = self.get_units_by_type(raw_obs, units.Zerg.Zergling, 4) # team 4: enemy team
+        self.banelings = self.get_units_by_type(raw_obs, units.Zerg.Baneling, 4)
 
-        marine_it = self.steps%len(marines)
+        #marine_it = self.steps%len(marines)
+        self.current_marine_it = self.steps%len(self.marines)
 
-        goal_dist = math.sqrt((marines[marine_it].x - self.goal[0])**2 + (marines[marine_it].y - self.goal[1])**2)
+        goal_dist = math.sqrt((self.marines[self.current_marine_it].x - self.goal[0])**2 + (self.marines[self.current_marine_it].y - self.goal[1])**2)
 
         #obs = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index]
         #obs = np.tile(obs, raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index])
@@ -301,6 +302,31 @@ class CustomAgent(gym.Env):
 
     def take_action(self, action):
         # map value to an action
+
+        selected = self.marines[self.current_marine_it]
+
+        if action[0] > 0:
+            x = 1
+        else:
+            x = -1
+
+        if action[1] > 0:
+            y = 1
+        else:
+            y = -1
+
+        attack = action[2]
+
+        if attack > 0.5:
+            #action_mapped = actions.RAW_FUNCTIONS.attack_closest(selected.tag)
+            action_mapped = actions.RAW_FUNCTIONS.no_op()
+        else:
+            new_pos = [selected.x + x, selected.y + y]
+            action_mapped = actions.RAW_FUNCTIONS.Move_pt("now", selected.tag, new_pos)
+
+        raw_obs = self.env.step([action_mapped])[0]
+
+        """
         if action == 0:
             action_mapped = actions.RAW_FUNCTIONS.no_op()
         elif action <= 32:
@@ -320,6 +346,7 @@ class CustomAgent(gym.Env):
             action_mapped = self.attack(aidx, eidx)
         
         raw_obs = self.env.step([action_mapped])[0]
+        """
 
         return raw_obs
 
