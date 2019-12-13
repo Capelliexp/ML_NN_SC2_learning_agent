@@ -32,6 +32,7 @@ model = PPO2(
     tensorboard_log="gym_ouput/PPO2_CNN_LSTM/log/"
     )
 
+model.setup_model()
 
 #model = PPO2.load("gym_ouput/NN")  # load existing network
 

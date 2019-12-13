@@ -10,7 +10,7 @@ from stable_baselines.common.policies import CnnLstmPolicy
 from stable_baselines.common.vec_env import DummyVecEnv, SubprocVecEnv
 
 from stable_baselines import PPO2
-from stable_baselines import SAC
+from stable_baselines import ACKTR
 
 from absl import flags
 
@@ -24,18 +24,20 @@ env = DummyVecEnv([lambda: CustomAgent()])
 
 # use ppo2 to learn and save the model when finished
 #model = PPO2(MlpPolicy, env, verbose=1, tensorboard_log="gym_ouput/log/")
-model = SAC(
+model = ACKTR(
     CnnLstmPolicy,
     env, 
     verbose=1, 
-    tensorboard_log="gym_ouput/SAC_CNN_LSTM/log/"
+    tensorboard_log="gym_ouput/ACKTR_CNN_LSTM/log/"
     )
+
+model.setup_model()
 
 #model = PPO2.load("gym_ouput/NN")  # load existing network
 
 for i in range(1,20):
-    save_name = "gym_ouput/SAC_CNN_LSTM/it" + i.__str__()
+    save_name = "gym_ouput/ACKTR_CNN_LSTM/it" + i.__str__()
 
-    model.learn(total_timesteps=int(3e4), tb_log_name="SAC_CNN_LSTM", reset_num_timesteps=False)
+    model.learn(total_timesteps=int(3e4), tb_log_name="ACKTR_CNN_LSTM", reset_num_timesteps=False)
     model.save(save_name)
 
