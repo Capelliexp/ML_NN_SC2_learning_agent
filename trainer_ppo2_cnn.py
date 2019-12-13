@@ -29,9 +29,10 @@ model = PPO2(
     env, 
     nminibatches = 1,
     verbose=1, 
-    tensorboard_log="gym_ouput/log/PPO2_CNN/"
+    tensorboard_log="gym_ouput/PPO2_CNN/log/"
     )
 
+model.setup_model()
 
 #model = PPO2.load("gym_ouput/NN")  # load existing network
 

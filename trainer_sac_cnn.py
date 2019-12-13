@@ -28,7 +28,7 @@ model = SAC(
     CnnPolicy,
     env, 
     verbose=1, 
-    tensorboard_log="gym_ouput/log/"
+    tensorboard_log="gym_ouput/SAC_CNN/log/"
     )
 
 

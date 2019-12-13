@@ -29,7 +29,7 @@ model = PPO2(
     env, 
     nminibatches = 1,
     verbose=1, 
-    tensorboard_log="gym_ouput/log/"
+    tensorboard_log="gym_ouput/PPO2_CNN_LSTM/log/"
     )
 
 
