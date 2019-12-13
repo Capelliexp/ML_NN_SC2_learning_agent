@@ -23,6 +23,9 @@ stable baselines tutorial:
 	https://github.com/openai/gym-soccer
 	https://towardsdatascience.com/create-a-customized-gym-environment-for-star-craft-2-8558d301131f
 
+CNN basics:
+	https://medium.com/nybles/a-brief-guide-to-convolutional-neural-network-cnn-642f47e88ed4
+
 starta pysc2 med agent:
 	py -3.5 -m pysc2.bin.agent --map <karta> --agent <agent>
 

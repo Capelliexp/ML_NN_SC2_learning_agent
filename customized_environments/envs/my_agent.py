@@ -170,7 +170,7 @@ class CustomAgent(gym.Env):
 
         #self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2+1, 64, 3), dtype = np.float32)
         #self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2, 64, 3), dtype = np.float32)
-        self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2, 64), dtype = np.float32)
+        self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2, 64, 1), dtype = np.float32)
 
         #self.action_space = spaces.Discrete(3)
         #self.action_space = spaces.Box(low = -1, high = 1, shape = (3, 3), dtype = np.float32)
@@ -228,6 +228,8 @@ class CustomAgent(gym.Env):
             raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index],
             raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index]
             ))
+        #np.resize(obs, (64*2, 64, 1))
+        obs.resize((64*2, 64, 1))
 
         """obs = np.tile(obs, [
             marines[marine_it].health,          # HP
