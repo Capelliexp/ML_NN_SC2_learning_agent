@@ -25,7 +25,7 @@ class CustomAgent(gym.Env):
             #feature_dimensions = None,
             feature_dimensions = features.Dimensions(screen=64, minimap=100),
             rgb_dimensions = None,
-            raw_resolution = 64,
+            #raw_resolution = 100, #låt den vara standard
             action_space = actions.ActionSpace.RAW,
             camera_width_world_units = None,
             #camera_width_world_units = 64,
@@ -83,7 +83,7 @@ class CustomAgent(gym.Env):
 
         self.goal = [0,0]
 
-        self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*3, 64, 1), dtype = np.float32)
+        self.observation_space = spaces.Box(low = 0, high = 255, shape = (100*3, 100, 1), dtype = np.float32)
 
         self.action_space = spaces.Box(np.array([-1, -1, 0]), np.array([1, 1, 1]))
 
@@ -136,8 +136,24 @@ class CustomAgent(gym.Env):
             raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.selected.index],
             raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.height_map.index]
             ))
+        
+        """
+        np.set_printoptions(threshold=np.inf)
 
-        obs.resize((64*3, 64, 1))
+        if self.episodes == 1 and self.steps == 2:
+            print("map player_relative")
+            print(raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.player_relative.index])
+
+        if self.episodes == 1 and self.steps == 3:
+            print("map selected")
+            print(raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.selected.index])
+
+        if self.episodes == 1 and self.steps == 4:
+            print("map height_map")
+            print(raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.height_map.index])
+        """
+
+        obs.resize((100*3, 100, 1))
         
         return obs
 
@@ -162,7 +178,7 @@ class CustomAgent(gym.Env):
         y = 1 if action[1] > 0 else -1
         attack = action[2]
 
-        print(str(action[0]) + " " + str(action[1]) + " " + str(action[2]))
+        #print(str(action[0]) + " " + str(action[1]) + " " + str(action[2]))
 
         action_mapped = []
 
