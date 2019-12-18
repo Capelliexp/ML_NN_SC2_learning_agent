@@ -17,7 +17,7 @@ class CustomAgent(gym.Env):
 
     default_settings = {    #OBS! fix
         '_only_use_kwargs': None,
-        'map_name': "DefeatZerglingsAndBanelings",
+        'map_name': "simple_1v1",
         'battle_net_map': False,
         'players': [sc2_env.Agent(sc2_env.Race.terran),
             sc2_env.Bot(sc2_env.Race.zerg, sc2_env.Difficulty.hard)],
