@@ -23,7 +23,7 @@ class CustomAgent(gym.Env):
             sc2_env.Bot(sc2_env.Race.zerg, sc2_env.Difficulty.hard)],
         'agent_interface_format': features.AgentInterfaceFormat(
             #feature_dimensions = None,
-            feature_dimensions = features.Dimensions(screen=64, minimap=64),
+            feature_dimensions = features.Dimensions(screen=64, minimap=100),
             rgb_dimensions = None,
             raw_resolution = 64,
             action_space = actions.ActionSpace.RAW,
@@ -83,7 +83,7 @@ class CustomAgent(gym.Env):
 
         self.goal = [0,0]
 
-        self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2, 64, 1), dtype = np.float32)
+        self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*3, 64, 1), dtype = np.float32)
 
         self.action_space = spaces.Box(np.array([-1, -1, 0]), np.array([1, 1, 1]))
 
@@ -123,12 +123,21 @@ class CustomAgent(gym.Env):
         else:
             self.current_marine_it = 0
 
+        """
         obs = np.concatenate((
             raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index],
-            raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index]
+            raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index],
+            raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.height_map.index]
+            ))
+        """
+
+        obs = np.concatenate((
+            raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.player_relative.index],
+            raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.selected.index],
+            raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.height_map.index]
             ))
 
-        obs.resize((64*2, 64, 1))
+        obs.resize((64*3, 64, 1))
         
         return obs
 
@@ -139,7 +148,6 @@ class CustomAgent(gym.Env):
 
     def step(self, action):
         self.steps += 1
-        print(self.steps)
 
         raw_obs = self.take_action(action)
         reward = raw_obs.reward
@@ -154,10 +162,12 @@ class CustomAgent(gym.Env):
         y = 1 if action[1] > 0 else -1
         attack = action[2]
 
+        print(str(action[0]) + " " + str(action[1]) + " " + str(action[2]))
+
         action_mapped = []
 
         if self.steps > 1:
-            if attack > 0.5:
+            if attack > 0:
                 action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, [self.selected.x, self.selected.y]))
             else:
                 new_pos = [self.selected.x + x*2, self.selected.y + y*2]
@@ -167,9 +177,6 @@ class CustomAgent(gym.Env):
         action_mapped.append(actions.RAW_FUNCTIONS.Behavior_HoldFireOff_quick("now", self.selected.tag))
 
         raw_obs = self.env.step([action_mapped])[0]
-
-        
-
 
         return raw_obs
 
