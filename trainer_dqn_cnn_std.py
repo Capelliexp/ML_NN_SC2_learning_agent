@@ -20,16 +20,16 @@ name = "dqn_std"
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type='DQN')])
 
+
+
 model = DQN(
     CnnPolicy,
     env, 
     learning_rate = 0.1,
+    double_q = True,
     verbose=1, 
     tensorboard_log="gym_ouput/" + name + "/log/"
     )
-
-
-
 
 
 model.setup_model()
