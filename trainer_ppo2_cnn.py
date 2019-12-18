@@ -31,7 +31,8 @@ model = PPO2(
 model.setup_model()
 
 for i in range(1,20):
-    save_name = "gym_ouput/PPO2_CNN/it" + i.__str__()
+    #save_name = "gym_ouput/PPO2_CNN/it" + i.__str__()
+    save_name = "gym_ouput/PPO2_CNN/model"
 
     model.learn(total_timesteps=int(3e4), tb_log_name="PPO2_CNN", reset_num_timesteps=False)
     model.save(save_name)

@@ -26,12 +26,13 @@ model = ACKTR(
     verbose=1, 
     tensorboard_log="gym_ouput/ACKTR_CNN_LSTM/log/"
     )
-    
+
 
 model.setup_model()
 
 for i in range(1,20):
-    save_name = "gym_ouput/ACKTR_CNN_LSTM/it" + i.__str__()
+    #save_name = "gym_ouput/ACKTR_CNN_LSTM/it" + i.__str__()
+    save_name = "gym_ouput/ACKTR_CNN_LSTM/model"
 
     model.learn(total_timesteps=int(3e4), tb_log_name="ACKTR_CNN_LSTM", reset_num_timesteps=False)
     model.save(save_name)

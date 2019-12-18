@@ -79,6 +79,8 @@ class CustomAgent(gym.Env):
         self.banelings = []
         self.zerglings = []
 
+        self.selected = []
+
         self.goal = [0,0]
 
         self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2, 64, 1), dtype = np.float32)
@@ -137,6 +139,7 @@ class CustomAgent(gym.Env):
 
     def step(self, action):
         self.steps += 1
+        print(self.steps)
 
         raw_obs = self.take_action(action)
         reward = raw_obs.reward
@@ -147,19 +150,26 @@ class CustomAgent(gym.Env):
     def take_action(self, action):
         # map value to an action
 
-        selected = self.marines[self.current_marine_it]
-
         x = 1 if action[0] > 0 else -1
         y = 1 if action[1] > 0 else -1
         attack = action[2]
 
-        if attack > 0.5:
-            action_mapped = actions.RAW_FUNCTIONS.Move_pt("now", selected.tag, [selected.x, selected.y])
-        else:
-            new_pos = [selected.x + x*2, selected.y + y*2]
-            action_mapped = actions.RAW_FUNCTIONS.Move_pt("now", selected.tag, new_pos)
+        action_mapped = []
+
+        if self.steps > 1:
+            if attack > 0.5:
+                action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, [self.selected.x, self.selected.y]))
+            else:
+                new_pos = [self.selected.x + x*2, self.selected.y + y*2]
+                action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, new_pos))
+        
+        self.selected = self.marines[self.current_marine_it]
+        action_mapped.append(actions.RAW_FUNCTIONS.Behavior_HoldFireOff_quick("now", self.selected.tag))
 
         raw_obs = self.env.step([action_mapped])[0]
+
+        
+
 
         return raw_obs
 
