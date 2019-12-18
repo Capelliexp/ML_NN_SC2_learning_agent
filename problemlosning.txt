@@ -16,3 +16,7 @@ Sep 13, 2017
 numphy version FutureWarning:
 	ändra numpy version från 1.17.4 till 1.14.5
 	och sen till 1.16.4
+
+WARNING:tensorflow: ... AssertionError: Bad argument number for Name: 3, expecting 4:
+	ändra gast version från 0.3.2 till 0.2.2
+	pip install --user gast==0.2.2

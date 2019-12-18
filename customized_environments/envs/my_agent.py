@@ -15,7 +15,7 @@ import numpy as np
 class CustomAgent(gym.Env):
     metadata = {'render.modes':['human']}
 
-    default_settings = {    #OBS! fix
+    default_settings = {
         '_only_use_kwargs': None,
         'map_name': "simple_1v1",
         'battle_net_map': False,
@@ -75,6 +75,9 @@ class CustomAgent(gym.Env):
         self.kwargs = kwargs
         self.env = None
 
+        all_args = {}
+        all_args.update(kwargs)
+        
         self.marines = []
         self.banelings = []
         self.zerglings = []
@@ -85,7 +88,16 @@ class CustomAgent(gym.Env):
 
         self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2, 64, 1), dtype = np.float32)
 
-        self.action_space = spaces.Box(np.array([-1, -1, 0]), np.array([1, 1, 1]))
+        self.action_type = "Box"
+
+        try:
+            if all_args['learn_type'] == "DQN":
+                self.action_space = spaces.Discrete(9)
+                self.action_type = "Discrete"
+            else:
+                self.action_space = spaces.Box(np.array([-1, -1, 0]), np.array([1, 1, 1]))
+        except:
+            self.action_space = spaces.Box(np.array([-1, -1, 0]), np.array([1, 1, 1]))
 
         self.episodes = 0
         self.steps = 0
@@ -93,18 +105,18 @@ class CustomAgent(gym.Env):
     def reset(self):
         self.episodes += 1
         self.steps = 0
-
-        self.goal = [0,0]
         
         if self.env is None:
-            args = {**self.default_settings, **self.kwargs}
+            args = {**self.default_settings} #, **self.kwargs 
             self.env =  sc2_env.SC2Env(**args)
         
         self.marines = []
         self.banelings = []
         self.zerglings = []
 
-        self.current_marine_it = 0
+        self.selected = []
+
+        self.goal = [0,0]
 
         raw_obs = self.env.reset()[0]
         
@@ -141,28 +153,30 @@ class CustomAgent(gym.Env):
 
         rel = raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.player_relative.index]
         sel = raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.selected.index]
-        res = np.add(rel, sel)
 
-        obs = np.concatenate(( res,
+        obs = np.concatenate(( np.add(rel, sel),
             raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.height_map.index]
             ))
 
-        
-        
+        """
         np.set_printoptions(threshold=np.inf)
 
-        if self.episodes == 1 and self.steps == 2:
-            print("map player_relative")
+        if self.episodes == 1 and self.steps == 1:
+            print("player_relative")
             print(raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.player_relative.index])
 
-        if self.episodes == 1 and self.steps == 3:
-            print("map selected")
+        if self.episodes == 1 and self.steps == 1:
+            print("selected")
             print(raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.selected.index])
+
+        if self.episodes == 1 and self.steps == 3:
+            print("res")
+            print(res)
 
         if self.episodes == 1 and self.steps == 4:
             print("map height_map")
             print(raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.height_map.index])
-        
+        """
 
         obs.resize((64*2, 64, 1))
         
@@ -185,23 +199,53 @@ class CustomAgent(gym.Env):
     def take_action(self, action):
         # map value to an action
 
-        x = 1 if action[0] > 0 else -1
-        y = 1 if action[1] > 0 else -1
-        attack = action[2]
-
-        #print(str(action[0]) + " " + str(action[1]) + " " + str(action[2]))
-
         action_mapped = []
 
-        if self.steps > 1:
-            if attack > 0:
-                action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, [self.selected.x, self.selected.y]))
-            else:
-                new_pos = [self.selected.x + x*2, self.selected.y + y*2]
-                action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, new_pos))
+        if self.action_type == "Box":
+            x = 1 if action[0] > 0 else -1
+            y = 1 if action[1] > 0 else -1
+            attack = action[2]
+
+            if self.steps > 1:
+                if attack > 0:
+                    action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, [self.selected.x, self.selected.y]))
+                else:
+                    new_pos = [self.selected.x + x*2, self.selected.y + y*2]
+                    action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, new_pos))
+
+            self.selected = self.marines[self.current_marine_it]
+            action_mapped.append(actions.RAW_FUNCTIONS.Behavior_HoldFireOff_quick("now", self.selected.tag))
         
-        self.selected = self.marines[self.current_marine_it]
-        action_mapped.append(actions.RAW_FUNCTIONS.Behavior_HoldFireOff_quick("now", self.selected.tag))
+        elif self.action_type == "Discrete":
+            if self.steps > 1:
+                if action < 8:
+                    if action == 0:
+                        new_pos = [self.selected.x + 2, self.selected.y]
+                    elif action == 1:
+                        new_pos = [self.selected.x + 2, self.selected.y + 2]
+                    elif action == 2:
+                        new_pos = [self.selected.x, self.selected.y + 2]
+                    elif action == 3:
+                        new_pos = [self.selected.x - 2, self.selected.y + 2]
+                    elif action == 4:
+                        new_pos = [self.selected.x - 2, self.selected.y]
+                    elif action == 5:
+                        new_pos = [self.selected.x - 2, self.selected.y - 2]
+                    elif action == 6:
+                        new_pos = [self.selected.x, self.selected.y - 2]
+                    elif action == 7:
+                        new_pos = [self.selected.x + 2, self.selected.y - 2]
+                    
+                    action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, new_pos))
+                
+                else:
+                    action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, [self.selected.x, self.selected.y]))
+
+            self.selected = self.marines[self.current_marine_it]
+            action_mapped.append(actions.RAW_FUNCTIONS.Behavior_HoldFireOff_quick("now", self.selected.tag))
+
+        else:
+            print("shit b fky as fuck")
 
         raw_obs = self.env.step([action_mapped])[0]
 

@@ -2,8 +2,6 @@ from customized_environments.envs.my_agent import CustomAgent
 
 import gym
 
-from stable_baselines.common.policies import MlpPolicy
-from stable_baselines.common.policies import MlpLstmPolicy
 from stable_baselines.common.policies import CnnPolicy
 from stable_baselines.common.policies import CnnLstmPolicy
 
@@ -17,25 +15,31 @@ from absl import flags
 FLAGS = flags.FLAGS
 FLAGS([''])
 
+name = "256_256"
+
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent()])
 
-policy_kwargs = dict(net_arch=[128, 64, 64, 16])
+policy_kwargs = dict(net_arch=[256, 256])
 
 model = PPO2(
     CnnPolicy,
     env, 
-    nminibatches = 1,
+    learning_rate = 0.1,
+    nminibatches = 8,
     verbose=1, 
     policy_kwargs=policy_kwargs,
-    tensorboard_log="gym_ouput/PPO2_CNN_large_2/log/"
+    tensorboard_log="gym_ouput/" + name + "/log/"
     )
 
 model.setup_model()
 
+start_value = 1
+if start_value > 0:
+    model.load("gym_ouput/" + name + "/it" + str(start_value), env=env)
+
 for i in range(1,20):
-    save_name = "gym_ouput/PPO2_CNN_large_2/it" + i.__str__()
-    #save_name = "gym_ouput/PPO2_CNN/model"
+    save_name = "gym_ouput/" + name + "/it" + (i+start_value).__str__()
 
     model.learn(total_timesteps=int(1e4), tb_log_name="log", reset_num_timesteps=False)
     model.save(save_name)
