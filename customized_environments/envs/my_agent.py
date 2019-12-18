@@ -23,7 +23,7 @@ class CustomAgent(gym.Env):
             sc2_env.Bot(sc2_env.Race.zerg, sc2_env.Difficulty.hard)],
         'agent_interface_format': features.AgentInterfaceFormat(
             #feature_dimensions = None,
-            feature_dimensions = features.Dimensions(screen=64, minimap=100),
+            feature_dimensions = features.Dimensions(screen=64, minimap=64),
             rgb_dimensions = None,
             #raw_resolution = 100, #låt den vara standard
             action_space = actions.ActionSpace.RAW,
@@ -83,7 +83,7 @@ class CustomAgent(gym.Env):
 
         self.goal = [0,0]
 
-        self.observation_space = spaces.Box(low = 0, high = 255, shape = (100*3, 100, 1), dtype = np.float32)
+        self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2, 64, 1), dtype = np.float32)
 
         self.action_space = spaces.Box(np.array([-1, -1, 0]), np.array([1, 1, 1]))
 
@@ -131,13 +131,24 @@ class CustomAgent(gym.Env):
             ))
         """
 
+        """
         obs = np.concatenate((
             raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.player_relative.index],
             raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.selected.index],
             raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.height_map.index]
             ))
-        
         """
+
+        rel = raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.player_relative.index]
+        sel = raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.selected.index]
+        res = np.add(rel, sel)
+
+        obs = np.concatenate(( res,
+            raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.height_map.index]
+            ))
+
+        
+        
         np.set_printoptions(threshold=np.inf)
 
         if self.episodes == 1 and self.steps == 2:
@@ -151,9 +162,9 @@ class CustomAgent(gym.Env):
         if self.episodes == 1 and self.steps == 4:
             print("map height_map")
             print(raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.height_map.index])
-        """
+        
 
-        obs.resize((100*3, 100, 1))
+        obs.resize((64*2, 64, 1))
         
         return obs
 
