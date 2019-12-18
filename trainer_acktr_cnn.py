@@ -18,22 +18,17 @@ FLAGS = flags.FLAGS
 FLAGS([''])
 
 # create vectorized environment
-#env = gym.make('defeat-zerglings-banelings-v0')
-#eng = CustomAgent()
 env = DummyVecEnv([lambda: CustomAgent()])
 
-# use ppo2 to learn and save the model when finished
-#model = PPO2(MlpPolicy, env, verbose=1, tensorboard_log="gym_ouput/log/")
 model = ACKTR(
     CnnPolicy,
     env, 
     verbose=1, 
     tensorboard_log="gym_ouput/ACKTR_CNN/log/"
     )
+    
 
 model.setup_model()
-
-#model = PPO2.load("gym_ouput/NN")  # load existing network
 
 for i in range(1,20):
     save_name = "gym_ouput/ACKTR_CNN/it" + i.__str__()

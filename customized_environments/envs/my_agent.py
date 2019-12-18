@@ -81,99 +81,8 @@ class CustomAgent(gym.Env):
 
         self.goal = [0,0]
 
-        """
-        self.observation_space = spaces.Box(    #preliminary
-            low=0,
-            high=64,
-            shape=(19,3),
-            dtype=np.uint8  #new
-        )
-        """
-
-        """
-        self.action_space = spaces.Discrete(123)  #preliminary
-        """
-
-        """
-        self.observation_space = spaces.Dict({
-            'tensor_ints' : spaces.Dict({
-                'HP' : spaces.Discrete(1),
-                'allies' : spaces.Discrete(1),
-                'enemies' : spaces.Discrete(1),
-                'pos' : spaces.Box(low = 0, high = 64, shape = (2,1), dtype = np.int32),
-                'goal' : spaces.Box(low = 0, high = 64, shape = (2,1), dtype = np.int32)
-            }),
-            'tensor_floats' : spaces.Dict({
-                'attack_reset' : spaces.Box(low = 0, high = 3, shape = (1,1), dtype = np.float32),
-                'distance_to_goal' : spaces.Box(low = 0, high = 100, shape = (1,1), dtype = np.float32)
-            }),
-            'textures' : spaces.Dict({
-                'player_relative' : spaces.Box(low = 0, high = 255, shape = (64,64), dtype = np.float32),
-                'selected' : spaces.Box(low = 0, high = 255, shape = (64,64), dtype = np.float32)
-            })
-        })
-
-        self.action_space = spaces.Dict({
-            'tensor_movement' : spaces.Dict({
-                'x' : spaces.Box(low = -1, high = 1, shape = (1,1), dtype = np.float32),
-                'y' : spaces.Box(low = -1, high = 1, shape = (1,1), dtype = np.float32),
-            }),
-            'tensor_actions' : spaces.Dict({
-                'attack_closest' : spaces.Discrete(1)
-            })
-        })
-        """
-
-        """
-        self.observation_space = spaces.Dict({
-            'HP' : spaces.Discrete(1),
-            'allies' : spaces.Discrete(1),
-            'enemies' : spaces.Discrete(1),
-            'pos' : spaces.Box(low = 0, high = 64, shape = (2,1), dtype = np.int32),
-            'goal' : spaces.Box(low = 0, high = 64, shape = (2,1), dtype = np.int32),
-            'attack_reset' : spaces.Box(low = 0, high = 3, shape = (1,1), dtype = np.float32),
-            'distance_to_goal' : spaces.Box(low = 0, high = 100, shape = (1,1), dtype = np.float32),
-            'player_relative' : spaces.Box(low = 0, high = 255, shape = (64,64), dtype = np.float32),
-            'selected' : spaces.Box(low = 0, high = 255, shape = (64,64), dtype = np.float32)
-        })
-
-        self.action_space = spaces.Dict({
-            'x' : spaces.Box(low = -1, high = 1, shape = (1,1), dtype = np.float32),
-            'y' : spaces.Box(low = -1, high = 1, shape = (1,1), dtype = np.float32),
-            'attack_closest' : spaces.Discrete(1)
-        })
-        """
-
-        """
-        self.observation_space = spaces.Tuple((
-            spaces.Discrete(1), # HP
-            spaces.Discrete(1), # allies
-            spaces.Discrete(1), # enemies
-            spaces.Box(low = 0, high = 64, shape = (2,1), dtype = np.int32),    # pos
-            spaces.Box(low = 0, high = 64, shape = (2,1), dtype = np.int32),    # goal
-            
-            spaces.Box(low = 0, high = 3, shape = (1,1), dtype = np.float32),   # attack_reset
-            spaces.Box(low = 0, high = 100, shape = (1,1), dtype = np.float32), # distance_to_goal
-            
-            spaces.Box(low = 0, high = 255, shape = (64,64), dtype = np.float32),   # player_relative
-            spaces.Box(low = 0, high = 255, shape = (64,64), dtype = np.float32)    # selected
-        ))
-        """
-
-        """
-        self.action_space = spaces.Tuple((
-            spaces.Box(low = -1, high = 1, shape = (1,1), dtype = np.float32),  # x
-            spaces.Box(low = -1, high = 1, shape = (1,1), dtype = np.float32),  # y
-            spaces.Discrete(1)  # attack_closest
-        ))
-        """
-
-        #self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2+1, 64, 3), dtype = np.float32)
-        #self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2, 64, 3), dtype = np.float32)
         self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2, 64, 1), dtype = np.float32)
 
-        #self.action_space = spaces.Discrete(3)
-        #self.action_space = spaces.Box(low = -1, high = 1, shape = (3, 3), dtype = np.float32)
         self.action_space = spaces.Box(np.array([-1, -1, 0]), np.array([1, 1, 1]))
 
         self.episodes = 0
@@ -203,93 +112,21 @@ class CustomAgent(gym.Env):
         # manualy convert raw_obs from pysc2 to the user defined input obs
         # return array with observation containing self.observation_space variables
 
-        #obs = np.zeros((64*2+1, 64, 3), dtype = np.float32)
-        #obs = np.zeros((19,3), dtype=np.uint8)
-
         self.marines = self.get_units_by_type(raw_obs, units.Terran.Marine, 1)   # team 1: my team
         self.zerglings = self.get_units_by_type(raw_obs, units.Zerg.Zergling, 4) # team 4: enemy team
         self.banelings = self.get_units_by_type(raw_obs, units.Zerg.Baneling, 4)
 
-        #marine_it = self.steps%len(marines)
         if len(self.marines) > 0:
             self.current_marine_it = self.steps%len(self.marines)
         else:
             self.current_marine_it = 0
 
-        #goal_dist = math.sqrt((self.marines[self.current_marine_it].x - self.goal[0])**2 + (self.marines[self.current_marine_it].y - self.goal[1])**2)
-
-        #obs = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index]
-        #obs = np.tile(obs, raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index])
-
-        #obs = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index]
-        #obs = obs + raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index]
-
         obs = np.concatenate((
             raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index],
             raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index]
             ))
-        #np.resize(obs, (64*2, 64, 1))
+
         obs.resize((64*2, 64, 1))
-
-        """obs = np.tile(obs, [
-            marines[marine_it].health,          # HP
-            len(marines),                       # allies
-            len(zerglings) + len(banelings),    # enemies
-            [marines[marine_it].x, marines[marine_it].y],   # pos
-            self.goal,                          # goal
-            marines[marine_it].weapon_cooldown, # attack_reset
-            goal_dist                           # distance_to_goal
-        ])"""
-        #obs = np.tile(obs, np.zeros((1, 64-9, 3), dtype = np.float32))
-        """obs = obs + [
-            marines[marine_it].health,          # HP
-            len(marines),                       # allies
-            len(zerglings) + len(banelings),    # enemies
-            [marines[marine_it].x, marines[marine_it].y],   # pos
-            self.goal,                          # goal
-            marines[marine_it].weapon_cooldown, # attack_reset
-            goal_dist                           # distance_to_goal
-        ]"""
-        #obs = obs + np.zeros((1, 64-9, 3), dtype = np.float32)
-
-        """
-        obs = self.observation_space
-        obs['tensor_ints']['HP'] = marines[marine_it].health
-        obs['tensor_ints']['allies'] = len(marines)
-        obs['tensor_ints']['enemies'] = len(zerglings) + len(banelings)
-        obs['tensor_ints']['pos'] = marines[marine_it].position
-        obs['tensor_ints']['goal'] = self.goal
-
-        obs['tensor_floats']['attack_reset'] = marines[marine_it].weapons[0].cooldown
-        obs['tensor_floats']['distance_to_goal'] = math.sqrt(
-            (marines[marine_it].position.x - self.goal[0])**2 + (marines[marine_it].position.y - self.goal[1])**2)
-
-        obs['textures']['player_relative'] = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index]
-        obs['textures']['selected'] = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.selected.index]
-        """
-
-        #player_relative = raw_obs.observation["screen"][features.SCREEN_FEATURES.player_relative.index]
-        #player_relative = raw_obs.observation["feature_screen"][features.SCREEN_FEATURES.player_relative.index]
-
-        #if player_relative is not None:
-        #    print("YAS!")
-        
-
-        #self.marines = []
-        #self.banelings = []
-        #self.zerglings = []
-
-        #for i, m in enumerate(marines):
-        #    self.marines.append(m)
-        #    obs[i] = np.array([m.x, m.y, m[2]])
-
-        #for i, b in enumerate(banelings):
-        #    self.banelings.append(b)
-        #    obs[i+9] = np.array([b.x, b.y, b[2]])
-
-        #for i, z in enumerate(zerglings):
-        #    self.zerglings.append(z)
-        #    obs[i+13] = np.array([z.x, z.y, z[2]])
         
         return obs
 
@@ -317,36 +154,12 @@ class CustomAgent(gym.Env):
         attack = action[2]
 
         if attack > 0.5:
-            #action_mapped = actions.RAW_FUNCTIONS.attack_closest(selected.tag)
-            #action_mapped = actions.RAW_FUNCTIONS.no_op()
             action_mapped = actions.RAW_FUNCTIONS.Move_pt("now", selected.tag, [selected.x, selected.y])
         else:
             new_pos = [selected.x + x*2, selected.y + y*2]
             action_mapped = actions.RAW_FUNCTIONS.Move_pt("now", selected.tag, new_pos)
 
         raw_obs = self.env.step([action_mapped])[0]
-
-        """
-        if action == 0:
-            action_mapped = actions.RAW_FUNCTIONS.no_op()
-        elif action <= 32:
-            derived_action = np.floor((action-1)/8)
-            idx = (action-1)%8
-            if derived_action == 0:
-                action_mapped = self.move(idx, 0, -2)
-            elif derived_action == 1:
-                action_mapped = self.move(idx, 0, 2)
-            elif derived_action == 2:
-                action_mapped = self.move(idx, -2, 0)
-            else:
-                action_mapped = self.move(idx, 2, 0)
-        else:
-            eidx = np.floor((action-33)/9)
-            aidx = (action-33)%9
-            action_mapped = self.attack(aidx, eidx)
-        
-        raw_obs = self.env.step([action_mapped])[0]
-        """
 
         return raw_obs
 
