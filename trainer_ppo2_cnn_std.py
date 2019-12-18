@@ -28,15 +28,15 @@ model = PPO2(
     nminibatches = 1,
     verbose=1, 
     policy_kwargs=policy_kwargs,
-    tensorboard_log="gym_ouput/PPO2_CNN/log/"
+    tensorboard_log="gym_ouput/PPO2_CNN_std/log/"
     )
 
 model.setup_model()
 
 for i in range(1,20):
-    save_name = "gym_ouput/PPO2_CNN/it" + i.__str__()
+    save_name = "gym_ouput/PPO2_CNN_std/it" + i.__str__()
     #save_name = "gym_ouput/PPO2_CNN/model"
 
-    model.learn(total_timesteps=int(1e4), tb_log_name="PPO2_CNN", reset_num_timesteps=False)
+    model.learn(total_timesteps=int(1e4), tb_log_name="log", reset_num_timesteps=False)
     model.save(save_name)
 

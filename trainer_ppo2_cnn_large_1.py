@@ -20,7 +20,7 @@ FLAGS([''])
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent()])
 
-policy_kwargs = dict(net_arch=[32, 32])
+policy_kwargs = dict(net_arch=[64, 64, 64])
 
 model = PPO2(
     CnnPolicy,
@@ -28,13 +28,13 @@ model = PPO2(
     nminibatches = 1,
     verbose=1, 
     policy_kwargs=policy_kwargs,
-    tensorboard_log="gym_ouput/PPO2_CNN_small/log/"
+    tensorboard_log="gym_ouput/PPO2_CNN_large/log/"
     )
 
 model.setup_model()
 
 for i in range(1,20):
-    save_name = "gym_ouput/PPO2_CNN_small/it" + i.__str__()
+    save_name = "gym_ouput/PPO2_CNN_large/it" + i.__str__()
     #save_name = "gym_ouput/PPO2_CNN/model"
 
     model.learn(total_timesteps=int(1e4), tb_log_name="log", reset_num_timesteps=False)
