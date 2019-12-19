@@ -15,7 +15,7 @@ FLAGS([''])
 
 name = "ppo2_mlp_256x4"
 learn_type='PPO2'
-start_value = 0
+start_value = 6
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
@@ -41,7 +41,7 @@ i = 1
 while True:
     save_name = "gym_ouput/" + name + "/it" + (i+start_value).__str__()
 
-    model.learn(total_timesteps=int(3e3), tb_log_name="log", reset_num_timesteps=False)
+    model.learn(total_timesteps=int(1e4), tb_log_name="log", reset_num_timesteps=False)
     model.save(save_name)
     i += 1
 
