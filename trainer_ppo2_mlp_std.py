@@ -2,7 +2,7 @@ from customized_environments.envs.my_agent import CustomAgent
 
 import gym
 
-from stable_baselines.common.policies import CnnPolicy
+from stable_baselines.common.policies import MlpPolicy
 
 from stable_baselines.common.vec_env import DummyVecEnv, SubprocVecEnv
 
@@ -13,24 +13,24 @@ from absl import flags
 FLAGS = flags.FLAGS
 FLAGS([''])
 
-name = "ppo2_cnn_256x8"
+name = "ppo2_mlp_std"
 learn_type='PPO2'
 start_value = 0
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
 
-policy_kwargs = dict(net_arch=[256, 256, 256, 256, 256, 256, 256, 256])
+
 
 model = PPO2(
-    CnnPolicy,
+    MlpPolicy,
     env, 
     learning_rate = 0.1,
     nminibatches = 8,
     verbose=1, 
-    policy_kwargs=policy_kwargs,
     tensorboard_log="gym_ouput/" + name + "/log/"
     )
+
 
 model.setup_model()
 

@@ -13,7 +13,7 @@ from absl import flags
 FLAGS = flags.FLAGS
 FLAGS([''])
 
-name = "dqn_std"
+name = "dqn_cnn_std"
 learn_type='DQN'
 start_value = 0
 
@@ -41,7 +41,7 @@ i = 1
 while True:
     save_name = "gym_ouput/" + name + "/it" + (i+start_value).__str__()
 
-    model.learn(total_timesteps=int(1e4), tb_log_name="log", reset_num_timesteps=False)
+    model.learn(total_timesteps=int(3e3), tb_log_name="log", reset_num_timesteps=False)
     model.save(save_name)
     i += 1
 

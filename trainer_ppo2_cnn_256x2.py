@@ -13,14 +13,14 @@ from absl import flags
 FLAGS = flags.FLAGS
 FLAGS([''])
 
-name = "ppo2_cnn_256x8"
+name = "ppo2_cnn_256x2"
 learn_type='PPO2'
 start_value = 0
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
 
-policy_kwargs = dict(net_arch=[256, 256, 256, 256, 256, 256, 256, 256])
+policy_kwargs = dict(net_arch=[256, 256])
 
 model = PPO2(
     CnnPolicy,
