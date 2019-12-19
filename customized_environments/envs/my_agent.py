@@ -88,16 +88,18 @@ class CustomAgent(gym.Env):
 
         self.observation_space = spaces.Box(low = 0, high = 255, shape = (64*2, 64, 1), dtype = np.float32)
 
-        self.action_type = "Box"
+        self.action_type = ""
 
         try:
             if all_args['learn_type'] == "DQN":
                 self.action_space = spaces.Discrete(9)
                 self.action_type = "Discrete"
-            else:
+            elif all_args['learn_type'] == "PPO2":
                 self.action_space = spaces.Box(np.array([-1, -1, 0]), np.array([1, 1, 1]))
+                self.action_type = "Box"
         except:
             self.action_space = spaces.Box(np.array([-1, -1, 0]), np.array([1, 1, 1]))
+            self.action_type = "Box"
 
         self.episodes = 0
         self.steps = 0
@@ -158,7 +160,9 @@ class CustomAgent(gym.Env):
             raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.height_map.index]
             ))
 
-        """
+        obs.resize((64*2, 64, 1))
+
+        
         np.set_printoptions(threshold=np.inf)
 
         if self.episodes == 1 and self.steps == 1:
@@ -170,15 +174,16 @@ class CustomAgent(gym.Env):
             print(raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.selected.index])
 
         if self.episodes == 1 and self.steps == 3:
-            print("res")
-            print(res)
+            print("rel + sel")
+            print(np.add(rel, sel))
 
         if self.episodes == 1 and self.steps == 4:
             print("map height_map")
             print(raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.height_map.index])
-        """
-
-        obs.resize((64*2, 64, 1))
+            
+        if self.episodes == 1 and self.steps == 5:
+            print("obs")
+            print(obs)
         
         return obs
 

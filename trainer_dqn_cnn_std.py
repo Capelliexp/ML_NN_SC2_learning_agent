@@ -6,8 +6,6 @@ from stable_baselines.deepq.policies import CnnPolicy
 
 from stable_baselines.common.vec_env import DummyVecEnv, SubprocVecEnv
 
-from stable_baselines import PPO2
-from stable_baselines import SAC
 from stable_baselines import DQN
 
 from absl import flags
@@ -16,9 +14,11 @@ FLAGS = flags.FLAGS
 FLAGS([''])
 
 name = "dqn_std"
+learn_type='DQN'
+start_value = 0
 
 # create vectorized environment
-env = DummyVecEnv([lambda: CustomAgent(learn_type='DQN')])
+env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
 
 
 
@@ -34,7 +34,6 @@ model = DQN(
 
 model.setup_model()
 
-start_value = 0
 if start_value > 0:
     model.load("gym_ouput/" + name + "/it" + str(start_value), env=env)
 

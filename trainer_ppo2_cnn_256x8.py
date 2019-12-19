@@ -3,12 +3,10 @@ from customized_environments.envs.my_agent import CustomAgent
 import gym
 
 from stable_baselines.common.policies import CnnPolicy
-from stable_baselines.common.policies import CnnLstmPolicy
 
 from stable_baselines.common.vec_env import DummyVecEnv, SubprocVecEnv
 
 from stable_baselines import PPO2
-from stable_baselines import SAC
 
 from absl import flags
 
@@ -16,9 +14,11 @@ FLAGS = flags.FLAGS
 FLAGS([''])
 
 name = "256x8"
+learn_type='PPO2'
+start_value = 0
 
 # create vectorized environment
-env = DummyVecEnv([lambda: CustomAgent()])
+env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
 
 policy_kwargs = dict(net_arch=[256, 256, 256, 256, 256, 256, 256, 256])
 
@@ -34,7 +34,6 @@ model = PPO2(
 
 model.setup_model()
 
-start_value = 0
 if start_value > 0:
     model.load("gym_ouput/" + name + "/it" + str(start_value), env=env)
 
