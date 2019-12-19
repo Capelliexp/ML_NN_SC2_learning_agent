@@ -34,13 +34,15 @@ model = PPO2(
 
 model.setup_model()
 
-start_value = 14
+start_value = 0
 if start_value > 0:
     model.load("gym_ouput/" + name + "/it" + str(start_value), env=env)
 
-for i in range(1,20):
+i = 1
+while True:
     save_name = "gym_ouput/" + name + "/it" + (i+start_value).__str__()
 
     model.learn(total_timesteps=int(1e4), tb_log_name="log", reset_num_timesteps=False)
     model.save(save_name)
+    i += 1
 
