@@ -15,7 +15,7 @@ FLAGS([''])
 
 name = "dqn_mlp_64x3"
 learn_type='DQN'
-start_value = 8
+start_value = 15
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
@@ -25,12 +25,12 @@ policy_kwargs = dict(layers=[64, 64, 64])
 model = DQN(
     MlpPolicy,
     env, 
-    learning_rate = 0.1,
-    exploration_fraction = 0.2,
+    learning_rate = 0.2,
+    exploration_fraction = 0.25,
     train_freq = 1,
     double_q = True,
-    learning_starts = 1000,
-    target_network_update_freq = 500,
+    learning_starts = 600,
+    target_network_update_freq = 300,
     param_noise = False,
     verbose=1, 
     policy_kwargs = policy_kwargs,
