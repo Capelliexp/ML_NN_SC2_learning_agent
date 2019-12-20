@@ -1,17 +1,5 @@
-DQN MLP std
-	0-24
-		attack move
-	24-32
-		attack move
-		
-DQN MLP 64x3
-	0-8
-		lite attack move
-	8-15
-		attack move
-	
-DQN MLP 128x2
-	0-35
-		attack move
-	35-41
-		attack move
+trainer_dqn_mlp_std_simple
+	basic behaviour: 3
+
+trainer_dqn_mlp_std_altered
+	basic behaviour: 1

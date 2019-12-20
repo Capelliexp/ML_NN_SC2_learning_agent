@@ -13,9 +13,9 @@ from absl import flags
 FLAGS = flags.FLAGS
 FLAGS([''])
 
-name = "dqn_mlp_std"
+name = "dqn_mlp_std_simple"
 learn_type='DQN'
-start_value = 24
+start_value = 3
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
@@ -54,7 +54,7 @@ i = 1
 while True:
     save_name = "gym_ouput/" + name + "/it" + (i+start_value).__str__()
 
-    model.learn(total_timesteps=int(3e3), tb_log_name="log", reset_num_timesteps=False)
+    model.learn(total_timesteps=int(5e4), tb_log_name="log", reset_num_timesteps=False)
     model.save(save_name)
     i += 1
 

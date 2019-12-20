@@ -14,9 +14,9 @@ from absl import flags
 FLAGS = flags.FLAGS
 FLAGS([''])
 
-name = "dqn_mlp_128x2"
+name = "dqn_mlp_std_altered"
 learn_type='DQN'
-model_iteration = 41
+model_iteration = 34
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])

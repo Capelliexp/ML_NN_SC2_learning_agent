@@ -58,7 +58,7 @@ class CustomAgent(gym.Env):
         'visualize': False,
         #'visualize': True,
         #'step_mul': None,
-        'step_mul': 16,
+        'step_mul': 2,
         'realtime': False,    #should be false during training
         'save_replay_episodes': 0,
         'replay_dir': None,
@@ -197,7 +197,7 @@ class CustomAgent(gym.Env):
             obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(0/tensor_count))][0] = self.selected.health * 5 # HP
             obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(1/tensor_count))][0] = len(self.marines) * 12 # allies
             obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(2/tensor_count))][0] = (len(self.zerglings) + len(self.banelings)) * 7 # enemies
-            obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(3/tensor_count))][0] = self.selected.weapon_cooldown * 255 # attack_reset
+            obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(3/tensor_count))][0] = (1 if self.selected.weapon_cooldown == 0 else 0) * 255 # attack_reset
             obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(4/tensor_count))][0] = np.amin(enemy_dist) * 4 # distance to closest enemy
             obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(5/tensor_count))][0] = rels[0] # x towards enemy
             obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(6/tensor_count))][0] = rels[1] # y towards enemy
