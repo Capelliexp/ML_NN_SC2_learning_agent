@@ -2,39 +2,40 @@ from customized_environments.envs.my_agent import CustomAgent
 
 import gym
 
-from stable_baselines.common.policies import MlpPolicy
+from stable_baselines.deepq.policies import MlpPolicy
 
 from stable_baselines.common.vec_env import DummyVecEnv, SubprocVecEnv
 
-from stable_baselines import PPO2
+from stable_baselines import DQN
 
 from absl import flags
 
 FLAGS = flags.FLAGS
 FLAGS([''])
 
-name = "ppo2_mlp_256x8"
-learn_type='PPO2'
-start_value = 26
+name = "dqn_mlp_128x2"
+learn_type='DQN'
+start_value = 0
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
 
-policy_kwargs = dict(net_arch=[256, 256, 256, 256, 256, 256, 256, 256])
+policy_kwargs = dict(layers=[128, 128])
 
-model = PPO2(
+model = DQN(
     MlpPolicy,
     env, 
     learning_rate = 0.1,
-    nminibatches = 8,
+    exploration_fraction = 0.2,
+    train_freq = 1,
+    double_q = True,
+    learning_starts = 1000,
+    target_network_update_freq = 500,
+    param_noise = False,
     verbose=1, 
-    policy_kwargs=policy_kwargs,
+    policy_kwargs = policy_kwargs,
     tensorboard_log="gym_ouput/" + name + "/log/"
     )
-
-
-
-
 
 
 model.setup_model()
@@ -53,7 +54,7 @@ i = 1
 while True:
     save_name = "gym_ouput/" + name + "/it" + (i+start_value).__str__()
 
-    model.learn(total_timesteps=int(1e4), tb_log_name="log", reset_num_timesteps=False)
+    model.learn(total_timesteps=int(3e3), tb_log_name="log", reset_num_timesteps=False)
     model.save(save_name)
     i += 1
 

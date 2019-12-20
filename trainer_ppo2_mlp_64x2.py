@@ -13,19 +13,19 @@ from absl import flags
 FLAGS = flags.FLAGS
 FLAGS([''])
 
-name = "ppo2_mlp_256x8"
+name = "ppo2_mlp_64x2"
 learn_type='PPO2'
-start_value = 26
+start_value = 1
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
 
-policy_kwargs = dict(net_arch=[256, 256, 256, 256, 256, 256, 256, 256])
+policy_kwargs = dict(net_arch=[64,64])
 
 model = PPO2(
     MlpPolicy,
     env, 
-    learning_rate = 0.1,
+    learning_rate = 0.5,
     nminibatches = 8,
     verbose=1, 
     policy_kwargs=policy_kwargs,

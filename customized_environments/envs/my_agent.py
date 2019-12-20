@@ -204,7 +204,7 @@ class CustomAgent(gym.Env):
             obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(7/tensor_count))][0] = np.amin(friend_dist) # distance to closest friend
             obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(8/tensor_count))][0] = rels[2] # x towards friend
             obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(9/tensor_count))][0] = rels[3] # y towards friend
-        
+
         """
         np.set_printoptions(threshold=np.inf)
 
@@ -243,7 +243,7 @@ class CustomAgent(gym.Env):
         reward = raw_obs.reward
         obs = self.get_derived_obs(raw_obs)
 
-        return obs, reward, raw_obs.last(), {}  #new
+        return obs, reward, raw_obs.last(), {}
 
     def take_action(self, action):
         # map value to an action

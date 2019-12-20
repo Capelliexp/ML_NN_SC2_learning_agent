@@ -32,10 +32,22 @@ model = DQN(
     )
 
 
+
+
+
+
+
 model.setup_model()
 
 if start_value > 0:
-    model.load("gym_ouput/" + name + "/it" + str(start_value), env=env)
+    try:
+        model.load("gym_ouput/" + name + "/it" + str(start_value + 1), env=env)
+        print("\n\nOBS! this is not the latest NN load point\n\n")
+    except:
+        try:
+            model.load("gym_ouput/" + name + "/it" + str(start_value), env=env)
+        except:
+            print("\n\nOBS! invalid load point\n\n")
 
 i = 1
 while True:
