@@ -15,7 +15,7 @@ FLAGS([''])
 
 name = "dqn_mlp_64x3"
 learn_type='DQN'
-start_value = 1
+start_value = 8
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
