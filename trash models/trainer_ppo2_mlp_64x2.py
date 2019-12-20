@@ -15,7 +15,7 @@ FLAGS([''])
 
 name = "ppo2_mlp_64x2"
 learn_type='PPO2'
-start_value = 1
+start_value = 0
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
@@ -31,6 +31,7 @@ model = PPO2(
     policy_kwargs=policy_kwargs,
     tensorboard_log="gym_ouput/" + name + "/log/"
     )
+
 
 
 
