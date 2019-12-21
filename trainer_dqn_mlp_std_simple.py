@@ -15,7 +15,7 @@ FLAGS([''])
 
 name = "dqn_mlp_std_simple"
 learn_type='DQN'
-start_value = 11
+start_value = 0
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
@@ -49,6 +49,9 @@ if start_value > 0:
             model.load("gym_ouput/" + name + "/it" + str(start_value), env=env)
         except:
             print("\n\nOBS! invalid load point\n\n")
+
+print("obs space: " + str(model.observation_space))
+print("act space: " + str(model.action_space))
 
 i = 1
 while True:

@@ -15,7 +15,7 @@ FLAGS([''])
 
 name = "dqn_mlp_std_altered"
 learn_type='DQN'
-start_value = 3
+start_value = 0
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
@@ -27,10 +27,10 @@ model = DQN(
     env, 
     learning_rate = 0.4,
     exploration_fraction = 0.2,
-    train_freq = 16,
-    double_q = True,
-    learning_starts = 500,
-    target_network_update_freq = 1000,
+    train_freq = 1,
+    double_q = False,
+    learning_starts = 320,
+    target_network_update_freq = 960,
     param_noise = False,
     verbose=0, 
     tensorboard_log="gym_ouput/" + name + "/log/"
@@ -49,6 +49,9 @@ if start_value > 0:
             model.load("gym_ouput/" + name + "/it" + str(start_value), env=env)
         except:
             print("\n\nOBS! invalid load point\n\n")
+
+print("obs space: " + str(model.observation_space))
+print("act space: " + str(model.action_space))
 
 i = 1
 while True:

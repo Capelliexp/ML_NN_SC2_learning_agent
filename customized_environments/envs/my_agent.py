@@ -89,13 +89,15 @@ class CustomAgent(gym.Env):
 
         self.goal = [0,0]
 
-        self.observation_space = spaces.Box(low = 0, high = 255, shape = (FEATURE_SIZES + 1, FEATURE_SIZES, 1), dtype = np.float32)
+        #self.observation_space = spaces.Box(low = 0, high = 255, shape = (FEATURE_SIZES + 1, FEATURE_SIZES, 1), dtype = np.float32)
+        self.observation_space = spaces.Box(low = 0, high = 1, shape = (10, 1), dtype = np.float32)
 
         self.action_type = ""
 
         try:
             if all_args['learn_type'] == "DQN":
-                self.action_space = spaces.Discrete(12)
+                #self.action_space = spaces.Discrete(12)
+                self.action_space = spaces.Discrete(4)
                 self.action_type = "Discrete"
             elif all_args['learn_type'] == "PPO2":
                 self.action_space = spaces.Box(np.array([-1, -1, 0, 0, 0]), np.array([1, 1, 1, 1, 1]))
@@ -140,25 +142,27 @@ class CustomAgent(gym.Env):
         else:
             self.current_marine_it = 0
 
-        rel = raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.player_relative.index]
-        sel = raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.selected.index]
-        rel_sel = np.add(rel, sel)
-        rel_sel[rel_sel == 1] = 64
-        rel_sel[rel_sel == 2] = 128
-        rel_sel[rel_sel == 4] = 255
+        #rel = raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.player_relative.index]
+        #sel = raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.selected.index]
+        #rel_sel = np.add(rel, sel)
+        #rel_sel[rel_sel == 1] = 64
+        #rel_sel[rel_sel == 2] = 128
+        #rel_sel[rel_sel == 4] = 255
 
-        hei = raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.height_map.index]
-        hei[hei > 0] = 32
+        #hei = raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.height_map.index]
+        #hei[hei > 0] = 32
 
-        obs = np.add(rel_sel, hei)
+        #obs = np.add(rel_sel, hei)
 
         #obs.resize((FEATURE_SIZES + 1, FEATURE_SIZES, 1))
-        obs = np.resize(obs, (FEATURE_SIZES + 1, FEATURE_SIZES, 1))
+        #obs = np.resize(obs, (FEATURE_SIZES + 1, FEATURE_SIZES, 1))
+
+        obs = [[0],[0],[0],[0],[0],[0],[0],[0],[0],[0]]
 
         if self.steps > 0:
-            rels = [0, 0, 0, 0]
+            rels = [0.0, 0.0, 0.0, 0.0]
 
-            enemy_dist = 255
+            enemy_dist = 255.0
             for zerg in self.zerglings:
                 dist = math.sqrt((self.selected.x - zerg.x)**2 + (self.selected.y - zerg.y)**2)
                 if dist < enemy_dist:
@@ -172,7 +176,7 @@ class CustomAgent(gym.Env):
                     rels[0] = (self.selected.x - zerg.x)
                     rels[1] = (self.selected.y - zerg.y)
 
-            friend_dist = 255
+            friend_dist = 255.0
             for friend in self.marines:
                 if friend.tag != self.selected.tag:
                     dist = math.sqrt((self.selected.x - friend.x)**2 + (self.selected.y - friend.y)**2)
@@ -191,19 +195,31 @@ class CustomAgent(gym.Env):
                     rels[i] = 128
             """
             self.toward_enemy = [rels[0], rels[1]]
-            rels = (np.sign(rels) + 1) * 127
+            new_rels = (np.sign(rels) + 1)/2
 
-            tensor_count = 9
-            obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(0/tensor_count))][0] = self.selected.health * 5 # HP
-            obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(1/tensor_count))][0] = len(self.marines) * 12 # allies
-            obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(2/tensor_count))][0] = (len(self.zerglings) + len(self.banelings)) * 7 # enemies
-            obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(3/tensor_count))][0] = (1 if self.selected.weapon_cooldown == 0 else 0) * 255 # attack_reset
-            obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(4/tensor_count))][0] = np.amin(enemy_dist) * 4 # distance to closest enemy
-            obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(5/tensor_count))][0] = rels[0] # x towards enemy
-            obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(6/tensor_count))][0] = rels[1] # y towards enemy
-            obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(7/tensor_count))][0] = np.amin(friend_dist) # distance to closest friend
-            obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(8/tensor_count))][0] = rels[2] # x towards friend
-            obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(9/tensor_count))][0] = rels[3] # y towards friend
+            #tensor_count = 9
+            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(0/tensor_count))][0] = self.selected.health/45 # HP
+            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(1/tensor_count))][0] = len(self.marines)/12 # allies
+            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(2/tensor_count))][0] = (len(self.zerglings) + len(self.banelings))/10 # enemies
+            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(3/tensor_count))][0] = (1 if self.selected.weapon_cooldown == 0 else 0) # attack_reset
+            ##obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(4/tensor_count))][0] = np.amin(enemy_dist) * 4 # distance to closest enemy
+            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(4/tensor_count))][0] = (1 if enemy_dist < 4 else 0) # distance to closest enemy
+            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(5/tensor_count))][0] = new_rels[0] # x towards enemy
+            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(6/tensor_count))][0] = new_rels[1] # y towards enemy
+            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(7/tensor_count))][0] = np.amin(friend_dist) # distance to closest friend
+            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(8/tensor_count))][0] = new_rels[2] # x towards friend
+            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(9/tensor_count))][0] = new_rels[3] # y towards friend
+
+            obs[0][0] = self.selected.health/45 # HP
+            obs[1][0] = len(self.marines)/12 # allies
+            obs[2][0] = (len(self.zerglings) + len(self.banelings))/10 # enemies
+            obs[3][0] = (1 if self.selected.weapon_cooldown == 0 else 0) # attack_reset
+            obs[4][0] = (1 if enemy_dist < 4 else 0) # distance to closest enemy
+            obs[5][0] = new_rels[0] # x towards enemy
+            obs[6][0] = new_rels[1] # y towards enemy
+            obs[7][0] = friend_dist/30 # distance to closest friend
+            obs[8][0] = new_rels[2] # x towards friend
+            obs[9][0] = new_rels[3] # y towards friend
 
         """
         np.set_printoptions(threshold=np.inf)
@@ -276,7 +292,7 @@ class CustomAgent(gym.Env):
         
         elif self.action_type == "Discrete":
             if self.steps > 1:
-                if action < 8:
+                """if action < 8:
                     if action == 0 or action == 4:      # right
                         new_pos = [self.selected.x + 2, self.selected.y]
                     elif action == 1 or action == 5:    # down
@@ -290,17 +306,35 @@ class CustomAgent(gym.Env):
                         action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, new_pos))
                     else:           # attack in direction
                         action_mapped.append(actions.RAW_FUNCTIONS.Attack_pt("now", self.selected.tag, new_pos))
-                
-                else:
-                    if action == 8 or action == 10:     # toward enemy
-                        new_pos = [self.selected.x + self.toward_enemy[0], self.selected.y + self.toward_enemy[1]]
-                    elif action == 9 or action == 11:   # away from enemy
-                        new_pos = [self.selected.x - self.toward_enemy[0], self.selected.y - self.toward_enemy[1]]
-                    
-                    if action == 8 or action == 9:      # move
-                        action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, new_pos))
-                    elif action == 10 or action == 11:  # attack
-                        action_mapped.append(actions.RAW_FUNCTIONS.Attack_pt("now", self.selected.tag, new_pos))
+                """
+
+                #else:
+                #if action == (8-8) or action == (10-8):     # toward enemy
+                #    new_pos = [self.selected.x + self.toward_enemy[0], self.selected.y + self.toward_enemy[1]]
+                #elif action == 9 or action == 11:   # away from enemy
+                #    new_pos = [self.selected.x - self.toward_enemy[0], self.selected.y - self.toward_enemy[1]]
+                #
+                #if action == (8-8) or action == (9-8):      # move
+                #    action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, new_pos))
+                #elif action == (10-8) or action == (11-8):  # attack
+                #    action_mapped.append(actions.RAW_FUNCTIONS.Attack_pt("now", self.selected.tag, new_pos))
+
+                if action == 1: # move toward enemy
+                    new_pos = [self.selected.x - self.toward_enemy[0], self.selected.y - self.toward_enemy[1]]
+                    action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, new_pos))
+                    #print("move 2 nmy: " + str(new_pos[0]) + ", " + str(new_pos[1]))
+                elif action == 2:   # move away from enemy
+                    new_pos = [self.selected.x + self.toward_enemy[0], self.selected.y + self.toward_enemy[1]]
+                    action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, new_pos))
+                    #print("move away from nmy: " + str(new_pos[0]) + ", " + str(new_pos[1]))
+                elif action == 3: # attack toward enemy
+                    new_pos = [self.selected.x - self.toward_enemy[0], self.selected.y - self.toward_enemy[1]]
+                    action_mapped.append(actions.RAW_FUNCTIONS.Attack_pt("now", self.selected.tag, new_pos))
+                    #print("attack nmy: " + str(new_pos[0]) + ", " + str(new_pos[1]))
+                elif action == 4:   # attack away from enemy
+                    new_pos = [self.selected.x + self.toward_enemy[0], self.selected.y + self.toward_enemy[1]]
+                    action_mapped.append(actions.RAW_FUNCTIONS.Attack_pt("now", self.selected.tag, new_pos))
+                    #print("attack away from nmy: " + str(new_pos[0]) + ", " + str(new_pos[1]))
 
         else:
             print("shit b fky as fuck")
