@@ -26,13 +26,13 @@ model = DQN(
     MlpPolicy,
     env, 
     learning_rate = 0.4,
-    exploration_fraction = 0.4,
-    train_freq = 1,
+    exploration_fraction = 0.2,
+    train_freq = 16,
     double_q = True,
-    learning_starts = 1920,
-    target_network_update_freq = 3840,
+    learning_starts = 500,
+    target_network_update_freq = 1000,
     param_noise = False,
-    verbose=1, 
+    verbose=0, 
     tensorboard_log="gym_ouput/" + name + "/log/"
     )
 
@@ -54,7 +54,7 @@ i = 1
 while True:
     save_name = "gym_ouput/" + name + "/it" + (i+start_value).__str__()
 
-    model.learn(total_timesteps=int(5e4), tb_log_name="log", reset_num_timesteps=False)
+    model.learn(total_timesteps=int(4e4), tb_log_name="log", reset_num_timesteps=False)
     model.save(save_name)
     i += 1
 

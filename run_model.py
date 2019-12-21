@@ -14,9 +14,9 @@ from absl import flags
 FLAGS = flags.FLAGS
 FLAGS([''])
 
-name = "dqn_mlp_std_altered"
+name = "dqn_mlp_std_simple"
 learn_type='DQN'
-model_iteration = 34
+model_iteration = 1
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
@@ -29,6 +29,7 @@ if model_iteration > 0:
 else:
     print("invalid model_iteration")
     exit
+    quit
 
 obs = env.reset()
 while True:
