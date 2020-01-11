@@ -15,7 +15,7 @@ FLAGS([''])
 
 name = "dqn_mlp_std_simple"
 learn_type='DQN'
-start_value = 0
+start_value = 7
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
@@ -25,7 +25,8 @@ env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
 model = DQN(
     MlpPolicy,
     env, 
-    learning_rate = 0.1,
+    learning_rate = 0.05,
+    exploration_fraction = 0.05,
     double_q = True,
     verbose=0, 
     tensorboard_log="gym_ouput/" + name + "/log/"
@@ -57,7 +58,7 @@ i = 1
 while True:
     save_name = "gym_ouput/" + name + "/it" + (i+start_value).__str__()
 
-    model.learn(total_timesteps=int(4e4), tb_log_name="log", reset_num_timesteps=False)
+    model.learn(total_timesteps=int(8e3), tb_log_name="log", reset_num_timesteps=False)
     model.save(save_name)
     i += 1
 

@@ -58,7 +58,7 @@ class CustomAgent(gym.Env):
         'visualize': False,
         #'visualize': True,
         #'step_mul': None,
-        'step_mul': 2,
+        'step_mul': 1,
         'realtime': False,    #should be false during training
         'save_replay_episodes': 0,
         'replay_dir': None,

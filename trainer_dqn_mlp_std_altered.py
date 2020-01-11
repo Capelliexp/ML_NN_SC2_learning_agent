@@ -57,7 +57,7 @@ i = 1
 while True:
     save_name = "gym_ouput/" + name + "/it" + (i+start_value).__str__()
 
-    model.learn(total_timesteps=int(4e4), tb_log_name="log", reset_num_timesteps=False)
+    model.learn(total_timesteps=int(8e3), tb_log_name="log", reset_num_timesteps=False)
     model.save(save_name)
     i += 1
 
