@@ -1,5 +1,0 @@
-trainer_dqn_mlp_std_simple
-	basic behaviour: 3
-
-trainer_dqn_mlp_std_altered
-	basic behaviour: 1
