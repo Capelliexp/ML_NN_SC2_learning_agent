@@ -15,29 +15,20 @@ FLAGS([''])
 
 name = "dqn_mlp_std_simple"
 learn_type='DQN'
-start_value = 7
+start_value = 0
 
 # create vectorized environment
 env = DummyVecEnv([lambda: CustomAgent(learn_type=learn_type)])
 
-
-
 model = DQN(
     MlpPolicy,
     env, 
-    learning_rate = 0.05,
-    exploration_fraction = 0.05,
+    learning_rate = 0.3,
+    exploration_fraction = 0.2,
     double_q = True,
     verbose=0, 
     tensorboard_log="gym_ouput/" + name + "/log/"
     )
-
-
-
-
-
-
-
 
 model.setup_model()
 
