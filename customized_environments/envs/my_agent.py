@@ -27,7 +27,7 @@ class CustomAgent(gym.Env):
             #feature_dimensions = None,
             feature_dimensions = features.Dimensions(screen=FEATURE_SIZES, minimap=FEATURE_SIZES),
             rgb_dimensions = None,
-            #raw_resolution = 100, #låt den vara standard
+            #raw_resolution = 100,
             action_space = actions.ActionSpace.RAW,
             camera_width_world_units = None,
             #camera_width_world_units = 64,
@@ -89,14 +89,12 @@ class CustomAgent(gym.Env):
 
         self.goal = [0,0]
 
-        #self.observation_space = spaces.Box(low = 0, high = 255, shape = (FEATURE_SIZES + 1, FEATURE_SIZES, 1), dtype = np.float32)
         self.observation_space = spaces.Box(low = 0, high = 1, shape = (10, 1), dtype = np.float32)
 
         self.action_type = ""
 
         try:
             if all_args['learn_type'] == "DQN":
-                #self.action_space = spaces.Discrete(12)
                 self.action_space = spaces.Discrete(4)
                 self.action_type = "Discrete"
             elif all_args['learn_type'] == "PPO2":
@@ -114,7 +112,7 @@ class CustomAgent(gym.Env):
         self.steps = 0
         
         if self.env is None:
-            args = {**self.default_settings} #, **self.kwargs 
+            args = {**self.default_settings}
             self.env =  sc2_env.SC2Env(**args)
         
         self.marines = []
@@ -141,21 +139,6 @@ class CustomAgent(gym.Env):
             self.current_marine_it = self.steps%len(self.marines)
         else:
             self.current_marine_it = 0
-
-        #rel = raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.player_relative.index]
-        #sel = raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.selected.index]
-        #rel_sel = np.add(rel, sel)
-        #rel_sel[rel_sel == 1] = 64
-        #rel_sel[rel_sel == 2] = 128
-        #rel_sel[rel_sel == 4] = 255
-
-        #hei = raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.height_map.index]
-        #hei[hei > 0] = 32
-
-        #obs = np.add(rel_sel, hei)
-
-        #obs.resize((FEATURE_SIZES + 1, FEATURE_SIZES, 1))
-        #obs = np.resize(obs, (FEATURE_SIZES + 1, FEATURE_SIZES, 1))
 
         obs = [[0],[0],[0],[0],[0],[0],[0],[0],[0],[0]]
 
@@ -185,65 +168,19 @@ class CustomAgent(gym.Env):
                         rels[2] = (self.selected.x - zerg.x)
                         rels[3] = (self.selected.y - zerg.y)
             
-            """
-            for i in range(len(rels)):
-                if rels[i] < 0:
-                    rels[i] = 0
-                elif rels[i] > 0:
-                    rels[i] = 255
-                else:
-                    rels[i] = 128
-            """
             self.toward_enemy = [rels[0], rels[1]]
             new_rels = (np.sign(rels) + 1)/2
 
-            #tensor_count = 9
-            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(0/tensor_count))][0] = self.selected.health/45 # HP
-            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(1/tensor_count))][0] = len(self.marines)/12 # allies
-            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(2/tensor_count))][0] = (len(self.zerglings) + len(self.banelings))/10 # enemies
-            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(3/tensor_count))][0] = (1 if self.selected.weapon_cooldown == 0 else 0) # attack_reset
-            ##obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(4/tensor_count))][0] = np.amin(enemy_dist) * 4 # distance to closest enemy
-            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(4/tensor_count))][0] = (1 if enemy_dist < 4 else 0) # distance to closest enemy
-            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(5/tensor_count))][0] = new_rels[0] # x towards enemy
-            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(6/tensor_count))][0] = new_rels[1] # y towards enemy
-            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(7/tensor_count))][0] = np.amin(friend_dist) # distance to closest friend
-            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(8/tensor_count))][0] = new_rels[2] # x towards friend
-            #obs[FEATURE_SIZES][int((FEATURE_SIZES-1)*(9/tensor_count))][0] = new_rels[3] # y towards friend
-
-            obs[0][0] = self.selected.health/45 # HP
-            obs[1][0] = len(self.marines)/12 # allies
-            obs[2][0] = (len(self.zerglings) + len(self.banelings))/10 # enemies
-            obs[3][0] = (1 if self.selected.weapon_cooldown == 0 else 0) # attack_reset
-            obs[4][0] = (1 if enemy_dist < 4 else 0) # distance to closest enemy
-            obs[5][0] = new_rels[0] # x towards enemy
-            obs[6][0] = new_rels[1] # y towards enemy
-            obs[7][0] = friend_dist/30 # distance to closest friend
-            obs[8][0] = new_rels[2] # x towards friend
-            obs[9][0] = new_rels[3] # y towards friend
-
-        """
-        np.set_printoptions(threshold=np.inf)
-
-        if self.episodes == 1 and self.steps == 1:
-            print("player_relative")
-            print(raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.player_relative.index])
-
-        if self.episodes == 1 and self.steps == 1:
-            print("selected")
-            print(raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.selected.index])
-
-        if self.episodes == 1 and self.steps == 3:
-            print("rel + sel")
-            print(np.add(rel, sel))
-
-        if self.episodes == 1 and self.steps == 4:
-            print("map height_map")
-            print(raw_obs.observation["feature_minimap"][features.MINIMAP_FEATURES.height_map.index])
-            
-        if self.episodes == 1 and self.steps == 5:
-            print("obs")
-            print(obs)
-        """
+            obs[0][0] = self.selected.health/45
+            obs[1][0] = len(self.marines)/12
+            obs[2][0] = (len(self.zerglings) + len(self.banelings))/10
+            obs[3][0] = (1 if self.selected.weapon_cooldown == 0 else 0)
+            obs[4][0] = (1 if enemy_dist < 4 else 0)
+            obs[5][0] = new_rels[0]
+            obs[6][0] = new_rels[1]
+            obs[7][0] = friend_dist/30
+            obs[8][0] = new_rels[2]
+            obs[9][0] = new_rels[3]
 
         return obs
 
@@ -292,49 +229,18 @@ class CustomAgent(gym.Env):
         
         elif self.action_type == "Discrete":
             if self.steps > 1:
-                """if action < 8:
-                    if action == 0 or action == 4:      # right
-                        new_pos = [self.selected.x + 2, self.selected.y]
-                    elif action == 1 or action == 5:    # down
-                        new_pos = [self.selected.x, self.selected.y + 2]
-                    elif action == 2 or action == 6:    # left
-                        new_pos = [self.selected.x - 2, self.selected.y]
-                    elif action == 3 or action == 7:    # up
-                        new_pos = [self.selected.x, self.selected.y - 2]
-
-                    if action < 4:  # move in direction
-                        action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, new_pos))
-                    else:           # attack in direction
-                        action_mapped.append(actions.RAW_FUNCTIONS.Attack_pt("now", self.selected.tag, new_pos))
-                """
-
-                #else:
-                #if action == (8-8) or action == (10-8):     # toward enemy
-                #    new_pos = [self.selected.x + self.toward_enemy[0], self.selected.y + self.toward_enemy[1]]
-                #elif action == 9 or action == 11:   # away from enemy
-                #    new_pos = [self.selected.x - self.toward_enemy[0], self.selected.y - self.toward_enemy[1]]
-                #
-                #if action == (8-8) or action == (9-8):      # move
-                #    action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, new_pos))
-                #elif action == (10-8) or action == (11-8):  # attack
-                #    action_mapped.append(actions.RAW_FUNCTIONS.Attack_pt("now", self.selected.tag, new_pos))
-
                 if action == 1: # move toward enemy
                     new_pos = [self.selected.x - self.toward_enemy[0], self.selected.y - self.toward_enemy[1]]
                     action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, new_pos))
-                    #print("move 2 nmy: " + str(new_pos[0]) + ", " + str(new_pos[1]))
                 elif action == 2:   # move away from enemy
                     new_pos = [self.selected.x + self.toward_enemy[0], self.selected.y + self.toward_enemy[1]]
                     action_mapped.append(actions.RAW_FUNCTIONS.Move_pt("now", self.selected.tag, new_pos))
-                    #print("move away from nmy: " + str(new_pos[0]) + ", " + str(new_pos[1]))
                 elif action == 3: # attack toward enemy
                     new_pos = [self.selected.x - self.toward_enemy[0], self.selected.y - self.toward_enemy[1]]
                     action_mapped.append(actions.RAW_FUNCTIONS.Attack_pt("now", self.selected.tag, new_pos))
-                    #print("attack nmy: " + str(new_pos[0]) + ", " + str(new_pos[1]))
                 elif action == 4:   # attack away from enemy
                     new_pos = [self.selected.x + self.toward_enemy[0], self.selected.y + self.toward_enemy[1]]
                     action_mapped.append(actions.RAW_FUNCTIONS.Attack_pt("now", self.selected.tag, new_pos))
-                    #print("attack away from nmy: " + str(new_pos[0]) + ", " + str(new_pos[1]))
 
         else:
             print("shit b fky as fuck")
@@ -361,11 +267,9 @@ class CustomAgent(gym.Env):
                 target = self.zerglines[eidx-4]
             else:
                 target = self.banelings[eidx]
-            return actions.RAW_FUNCTIONS.Attack_unit("now", selected.tag, target.tag) #OBS! used to be "targeted"
+            return actions.RAW_FUNCTIONS.Attack_unit("now", selected.tag, target.tag)
         except:
             return actions.RAW_FUNCTIONS.no_op()
-
-    
 
     def render(self, mode='human', close=False):
         pass
